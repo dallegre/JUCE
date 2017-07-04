@@ -1,18 +1,10 @@
 #pragma once
 
-#define DELAYSIZE 48000
+#define DELAYSIZE 24000
 
 class Delay {
 
 public:
-
-	//actual delay buffer
-	float delay[2][DELAYSIZE];
-
-	int delaySize;
-	int delaySizeOld;
-	int delayReadIndex[2];
-	int delayWriteIndex[2];
 
 	Delay(void) {}
 
@@ -85,5 +77,15 @@ public:
 			delay[channel][delayWriteIndex[channel]] = input;
 		}
 	}
+
+private:
+
+	//actual delay buffer
+	float delay[2][DELAYSIZE];
+
+	int delaySize;
+	int delaySizeOld;
+	int delayReadIndex[2];
+	int delayWriteIndex[2];
 
 };
