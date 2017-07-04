@@ -89,10 +89,12 @@ void Juce_vstAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
-	volumeVal = 0.5;
-	wetVal = 0.5;
-	feedbackVal = 0.5;
-	delayVal = 0.5;
+	dryVal = 0.5f;
+	wetVal = 0.5f;
+	feedbackVal = 0.5f;
+	delayVal = 0.5f;
+	oscAmtVal = 0.5f;
+	oscFreqVal = 0.5f;
 	delay.prepareToPlay();
 }
 
@@ -126,17 +128,17 @@ bool Juce_vstAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts)
 }
 #endif
 
-void Juce_vstAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
+void Juce_vstAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
 {
-    const int totalNumInputChannels  = getTotalNumInputChannels();
-    const int totalNumOutputChannels = getTotalNumOutputChannels();
+	const int totalNumInputChannels = getTotalNumInputChannels();
+	const int totalNumOutputChannels = getTotalNumOutputChannels();
 
-    // In case we have more outputs than inputs, this code clears any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming feedback
-    // when they first compile a plugin, but obviously you don't need to keep
-    // this code if your algorithm always overwrites all the output channels.
+	// In case we have more outputs than inputs, this code clears any output
+	// channels that didn't contain input data, (because these aren't
+	// guaranteed to be empty - they may contain garbage).
+	// This is here to avoid people getting screaming feedback
+	// when they first compile a plugin, but obviously you don't need to keep
+	// this code if your algorithm always overwrites all the output channels.
 	for (int i = totalNumInputChannels; i < totalNumOutputChannels; ++i) {
 
 		buffer.clear(i, 0, buffer.getNumSamples());
@@ -149,19 +151,20 @@ void Juce_vstAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer
 	{
 		// ..do something to the data...
 		for (int sample = 0; sample < buffer.getNumSamples(); ++sample) {
-			
+
 			//this is how you get data from the inputs
 			float data = buffer.getSample(channel, sample);
-			
+
 			//how to synthesize noise
 			//data = random.nextFloat() * 0.25f - 0.125f;
-			data *= volumeVal;
 
 			//apply a delay
-			delay.updateIndex(delayVal, channel);	
-			delay.write(channel,(data + feedbackVal * delay.read(channel)));
-			data = data + wetVal * delay.read(channel);
-			delay.clearUnused(channel);
+			float oscAmtValScaled = 500.0f * oscAmtVal;				//amount in samples of modulation
+			float oscFreqValScaled = 20.0f * oscFreqVal;			//frequency (roughly) of modulation
+			delay.updateIndex(delayVal, oscAmtValScaled, oscFreqValScaled, channel);
+			delay.write(channel, (data + feedbackVal * delay.read(channel)));
+			data = dryVal * data + wetVal * delay.read(channel);
+			//delay.clearUnused(channel);
 
 			buffer.setSample(channel, sample, data);
 
