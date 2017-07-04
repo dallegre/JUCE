@@ -58,10 +58,12 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
 	//variable to handle the volume control.  Not sure about making it public
-	float volumeVal;
+	float dryVal;
 	float wetVal;
 	float feedbackVal;
 	float delayVal;
+	float oscAmtVal;
+	float oscFreqVal;
 	Random random;
 	//just for fun
 	//const int DELAYSIZE = 2.0 * int(juce::AudioProcessor::getSampleRate());

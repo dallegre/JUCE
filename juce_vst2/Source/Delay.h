@@ -40,7 +40,7 @@ public:
 		delaySizeOld = 0;
 
 		delaySizeFrac = 0.0f;
-		lpVal = 0.0;
+		lpVal = 0.0f;
 		
 		//clear the delay buffer
 		for (int i = 0; i < DELAYSIZE; i++) {
@@ -51,11 +51,11 @@ public:
 
 		//filter for smoothing the delay time control
 		controlFilter.setFc(1.0f/(48000));
-
+		modOsc.setF(48000 * 0.1f, 100.0f);
 	}
 
 	//update index.  operates on delayReadIndex and delayWJriteIndex, which are arrays of 2 for left/right indeces.
-	void updateIndex(float delayVal, int channel) {
+	void updateIndex(float delayVal, float modAmt, float modFreq, int channel) {
 
 		delayWriteIndex[channel]++;
 		delayReadIndex[channel]++;
@@ -68,7 +68,10 @@ public:
 
 		delaySize = float(DELAYSIZE) - float(DELAYSIZE) * delayVal;
 		delaySize = controlFilter.process(delaySize);
+		modOsc.setF(48000 * modFreq, modAmt);
+		delaySize += modOsc.process(0);
 		delaySizeFrac = delaySize - int(delaySize);
+
 
 		delayReadIndex[channel] = delayWriteIndex[channel] + int(delaySize);
 		if (delayReadIndex[channel] >= DELAYSIZE) {
@@ -115,5 +118,6 @@ private:
 	float lpVal;
 
 	OnePoleLp controlFilter;
+	gsOsc modOsc;
 
 };

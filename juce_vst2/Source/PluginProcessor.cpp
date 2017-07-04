@@ -89,10 +89,12 @@ void Juce_vst2AudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
-	volumeVal = 0.5;
-	wetVal = 0.5;
-	feedbackVal = 0.5;
-	delayVal = 0.5;
+	dryVal = 0.5f;
+	wetVal = 0.5f;
+	feedbackVal = 0.5f;
+	delayVal = 0.5f;
+	oscAmtVal = 0.5f;
+	oscFreqVal = 0.5f;
 	delay.prepareToPlay();
 }
 
@@ -155,12 +157,13 @@ void Juce_vst2AudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffe
 
 			//how to synthesize noise
 			//data = random.nextFloat() * 0.25f - 0.125f;
-			data *= volumeVal;
 
 			//apply a delay
-			delay.updateIndex(delayVal, channel);
+			float oscAmtValScaled = 500.0f * oscAmtVal;				//amount in samples of modulation
+			float oscFreqValScaled = 20.0f * oscFreqVal;			//frequency (roughly) of modulation
+			delay.updateIndex(delayVal, oscAmtValScaled, oscFreqValScaled, channel);
 			delay.write(channel, (data + feedbackVal * delay.read(channel)));
-			data = data + wetVal * delay.read(channel);
+			data = dryVal * data + wetVal * delay.read(channel);
 			//delay.clearUnused(channel);
 
 			buffer.setSample(channel, sample, data);

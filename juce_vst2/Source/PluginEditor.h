@@ -32,10 +32,12 @@ private:
     // access the processor object that created it.
     Juce_vst2AudioProcessor& processor;
 
-	Slider volumeSlider;
+	Slider drySlider;
 	Slider wetSlider;
 	Slider feedbackSlider;
 	Slider delaySlider;
+	Slider oscFreqSlider;
+	Slider oscAmtSlider;
 	void sliderValueChanged(Slider* slider) override;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Juce_vst2AudioProcessorEditor)
