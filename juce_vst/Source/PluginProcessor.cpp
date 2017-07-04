@@ -93,17 +93,7 @@ void Juce_vstAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
 	wetVal = 0.5;
 	feedbackVal = 0.5;
 	delayVal = 0.5;
-	for (int i = 0; i < DELAYSIZE; i++) {
-		for (int lr = 0; lr < 2; lr++) {
-			delay[lr][i] = 0.0f;
-		}
-	}
-	delayWriteIndex[0] = 0;
-	delayWriteIndex[1] = 0;
-	delayReadIndex[0] = 0;
-	delayReadIndex[1] = 0;
-	delaySize = 0;
-	delaySizeOld = 0;
+	delay.prepareToPlay();
 }
 
 void Juce_vstAudioProcessor::releaseResources()
@@ -165,37 +155,16 @@ void Juce_vstAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer
 			
 			//how to synthesize noise
 			//data = random.nextFloat() * 0.25f - 0.125f;
-			data *= 0.25f;
 			data *= volumeVal;
 
 			//apply a delay
-			delayWriteIndex[channel] += 1;
-			delaySize = int(DELAYSIZE * delayVal);
-			if (delayWriteIndex[channel] >= delaySize) {
-				delayWriteIndex[channel] = 0;
-			}
-			delayReadIndex[channel] = delayWriteIndex[channel] + 1;
-			if (delayReadIndex[channel] >= delaySize) {
-				delayReadIndex[channel] = 0;
-			}
-			//make sure you don't go out of bounds.
-			if (delayWriteIndex[channel] < DELAYSIZE & delayReadIndex[channel] < DELAYSIZE) {
-				delay[channel][delayWriteIndex[channel]] = data + feedbackVal * delay[channel][delayReadIndex[channel]];
-			}
-			data = data + wetVal * delay[channel][delayReadIndex[channel]];
-			data *= 4;
+			delay.updateIndex(delayVal, channel);	
+			delay.write(channel,(data + feedbackVal * delay.read(channel)));
+			data = data + wetVal * delay.read(channel);
+
 			buffer.setSample(channel, sample, data);
 
-			//if the delay is shorter than the previous size, zero out the samples you left behind
-			if (delaySizeOld > delaySize) {
-				for (int i = delaySize; i < delaySizeOld; i++) {
-					//make sure you don't go out of bounds.
-					if (i < DELAYSIZE) {
-						delay[channel][i] = 0.0f;
-					}
-				}
-			}
-			delaySizeOld = delaySize;
+			delay.clearUnused(channel);
 
 		}
 	}

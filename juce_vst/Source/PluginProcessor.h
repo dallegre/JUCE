@@ -10,7 +10,10 @@
 
 #pragma once
 
+#include "Delay.h"
+
 #include "../JuceLibraryCode/JuceHeader.h"
+
 
 #define DELAYSIZE 24000
 
@@ -64,11 +67,7 @@ public:
 	Random random;
 	//just for fun
 	//const int DELAYSIZE = 2.0 * int(juce::AudioProcessor::getSampleRate());
-	float delay[2][DELAYSIZE];
-	int delayReadIndex[2];
-	int delayWriteIndex[2];
-	int delaySize;
-	int delaySizeOld;
+	Delay delay;
 
 private:
     //==============================================================================

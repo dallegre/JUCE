@@ -84,10 +84,10 @@ void Juce_vstAudioProcessorEditor::paint (Graphics& g)
 
 	g.setColour(Colours::black);
 	g.setFont(15.0f);
-	g.drawFittedText("Volume", 0, 0, getWidth(), 30, Justification::left, 1);
-	g.drawFittedText("Wet", 75, 0, getWidth(), 30, Justification::left, 1);
-	g.drawFittedText("Feedback", 150, 0, getWidth(), 30, Justification::left, 1);
-	g.drawFittedText("Delay", 225, 0, getWidth(), 30, Justification::left, 1);
+	g.drawFittedText("Vol", 30, 0, getWidth(), 30, Justification::bottom, 1);
+	g.drawFittedText("Wet", 100, 0, getWidth(), 30, Justification::bottom, 1);
+	g.drawFittedText("Fbk", 170, 0, getWidth(), 30, Justification::bottom, 1);
+	g.drawFittedText("Del", 240, 0, getWidth(), 30, Justification::bottom, 1);
 }
 
 void Juce_vstAudioProcessorEditor::resized()
