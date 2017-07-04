@@ -90,6 +90,7 @@ void Juce_vstAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
 	volumeVal = 0.5;
+	wetVal = 0.5;
 	feedbackVal = 0.5;
 	delayVal = 0.5;
 	for (int i = 0; i < DELAYSIZE; i++) {
@@ -97,8 +98,12 @@ void Juce_vstAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
 			delay[lr][i] = 0.0f;
 		}
 	}
-	delayWriteIndex = 0;
-	delayReadIndex = 0;
+	delayWriteIndex[0] = 0;
+	delayWriteIndex[1] = 0;
+	delayReadIndex[0] = 0;
+	delayReadIndex[1] = 0;
+	delaySize = 0;
+	delaySizeOld = 0;
 }
 
 void Juce_vstAudioProcessor::releaseResources()
@@ -159,21 +164,39 @@ void Juce_vstAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer
 			float data = buffer.getSample(channel, sample);
 			
 			//how to synthesize noise
-			data = random.nextFloat() * 0.25f - 0.125f;
+			//data = random.nextFloat() * 0.25f - 0.125f;
+			data *= 0.25f;
 			data *= volumeVal;
 
 			//apply a delay
-			delayWriteIndex += 1;
-			if (delayWriteIndex >= (DELAYSIZE * delayVal)) {
-				delayWriteIndex = 0;
+			delayWriteIndex[channel] += 1;
+			delaySize = int(DELAYSIZE * delayVal);
+			if (delayWriteIndex[channel] >= delaySize) {
+				delayWriteIndex[channel] = 0;
 			}
-			delayReadIndex = delayWriteIndex + 1;
-			if (delayReadIndex >= (DELAYSIZE * delayVal)) {
-				delayReadIndex = 0;
+			delayReadIndex[channel] = delayWriteIndex[channel] + 1;
+			if (delayReadIndex[channel] >= delaySize) {
+				delayReadIndex[channel] = 0;
 			}
-			delay[channel][delayWriteIndex] = data + feedbackVal * delay[channel][delayReadIndex];
-			data = data + 0.5f * delay[channel][delayReadIndex];
+			//make sure you don't go out of bounds.
+			if (delayWriteIndex[channel] < DELAYSIZE & delayReadIndex[channel] < DELAYSIZE) {
+				delay[channel][delayWriteIndex[channel]] = data + feedbackVal * delay[channel][delayReadIndex[channel]];
+			}
+			data = data + wetVal * delay[channel][delayReadIndex[channel]];
+			data *= 4;
 			buffer.setSample(channel, sample, data);
+
+			//if the delay is shorter than the previous size, zero out the samples you left behind
+			if (delaySizeOld > delaySize) {
+				for (int i = delaySize; i < delaySizeOld; i++) {
+					//make sure you don't go out of bounds.
+					if (i < DELAYSIZE) {
+						delay[channel][i] = 0.0f;
+					}
+				}
+			}
+			delaySizeOld = delaySize;
+
 		}
 	}
 }

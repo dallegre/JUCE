@@ -33,6 +33,7 @@ private:
     Juce_vstAudioProcessor& processor;
 
 	Slider volumeSlider;
+	Slider wetSlider;
 	Slider feedbackSlider;
 	Slider delaySlider;
 	void sliderValueChanged(Slider* slider) override;

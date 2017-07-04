@@ -58,14 +58,17 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
 	float volumeVal;
+	float wetVal;
 	float feedbackVal;
 	float delayVal;
 	Random random;
 	//just for fun
 	//const int DELAYSIZE = 2.0 * int(juce::AudioProcessor::getSampleRate());
 	float delay[2][DELAYSIZE];
-	int delayReadIndex;
-	int delayWriteIndex;
+	int delayReadIndex[2];
+	int delayWriteIndex[2];
+	int delaySize;
+	int delaySizeOld;
 
 private:
     //==============================================================================
