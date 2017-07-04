@@ -13,7 +13,7 @@
 
 
 //==============================================================================
-Juce_vstAudioProcessor::Juce_vstAudioProcessor()
+FileplayerAudioProcessor::FileplayerAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
      : AudioProcessor (BusesProperties()
                      #if ! JucePlugin_IsMidiEffect
@@ -27,17 +27,17 @@ Juce_vstAudioProcessor::Juce_vstAudioProcessor()
 {
 }
 
-Juce_vstAudioProcessor::~Juce_vstAudioProcessor()
+FileplayerAudioProcessor::~FileplayerAudioProcessor()
 {
 }
 
 //==============================================================================
-const String Juce_vstAudioProcessor::getName() const
+const String FileplayerAudioProcessor::getName() const
 {
     return JucePlugin_Name;
 }
 
-bool Juce_vstAudioProcessor::acceptsMidi() const
+bool FileplayerAudioProcessor::acceptsMidi() const
 {
    #if JucePlugin_WantsMidiInput
     return true;
@@ -46,7 +46,7 @@ bool Juce_vstAudioProcessor::acceptsMidi() const
    #endif
 }
 
-bool Juce_vstAudioProcessor::producesMidi() const
+bool FileplayerAudioProcessor::producesMidi() const
 {
    #if JucePlugin_ProducesMidiOutput
     return true;
@@ -55,60 +55,52 @@ bool Juce_vstAudioProcessor::producesMidi() const
    #endif
 }
 
-double Juce_vstAudioProcessor::getTailLengthSeconds() const
+double FileplayerAudioProcessor::getTailLengthSeconds() const
 {
     return 0.0;
 }
 
-int Juce_vstAudioProcessor::getNumPrograms()
+int FileplayerAudioProcessor::getNumPrograms()
 {
     return 1;   // NB: some hosts don't cope very well if you tell them there are 0 programs,
                 // so this should be at least 1, even if you're not really implementing programs.
 }
 
-int Juce_vstAudioProcessor::getCurrentProgram()
+int FileplayerAudioProcessor::getCurrentProgram()
 {
     return 0;
 }
 
-void Juce_vstAudioProcessor::setCurrentProgram (int index)
+void FileplayerAudioProcessor::setCurrentProgram (int index)
 {
 }
 
-const String Juce_vstAudioProcessor::getProgramName (int index)
+const String FileplayerAudioProcessor::getProgramName (int index)
 {
     return {};
 }
 
-void Juce_vstAudioProcessor::changeProgramName (int index, const String& newName)
+void FileplayerAudioProcessor::changeProgramName (int index, const String& newName)
 {
 }
 
 //==============================================================================
-void Juce_vstAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
+void FileplayerAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
-	volumeVal = 0.5;
-	feedbackVal = 0.5;
-	delayVal = 0.5;
-	for (int i = 0; i < DELAYSIZE; i++) {
-		for (int lr = 0; lr < 2; lr++) {
-			delay[lr][i] = 0.0f;
-		}
-	}
-	delayWriteIndex = 0;
-	delayReadIndex = 0;
+	transportSource.prepareToPlay(samplesPerBlock, sampleRate);
 }
 
-void Juce_vstAudioProcessor::releaseResources()
+void FileplayerAudioProcessor::releaseResources()
 {
     // When playback stops, you can use this as an opportunity to free up any
     // spare memory, etc.
+	transportSource.releaseResources();
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
-bool Juce_vstAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
+bool FileplayerAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
   #if JucePlugin_IsMidiEffect
     ignoreUnused (layouts);
@@ -131,7 +123,16 @@ bool Juce_vstAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts)
 }
 #endif
 
-void Juce_vstAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
+
+void FileplayerAudioProcessor::getNextAudioBlock(AudioSourceChannelInfo &bufferToFill) {
+	if (readerSource == nullptr){
+		bufferToFill.clearActiveBufferRegion();
+		return;
+	}
+	transportSource.getNextAudioBlock(bufferToFill);
+}
+
+void FileplayerAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
 {
     const int totalNumInputChannels  = getTotalNumInputChannels();
     const int totalNumOutputChannels = getTotalNumOutputChannels();
@@ -142,62 +143,35 @@ void Juce_vstAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer
     // This is here to avoid people getting screaming feedback
     // when they first compile a plugin, but obviously you don't need to keep
     // this code if your algorithm always overwrites all the output channels.
-	for (int i = totalNumInputChannels; i < totalNumOutputChannels; ++i) {
-
-		buffer.clear(i, 0, buffer.getNumSamples());
-
-	}
-
-	// This is the place where you'd normally do the guts of your plugin's
-	// audio processing...
-	for (int channel = 0; channel < totalNumInputChannels; ++channel)
-	{
-		// ..do something to the data...
-		for (int sample = 0; sample < buffer.getNumSamples(); ++sample) {
-			
-			//this is how you get data from the inputs
-			float data = buffer.getSample(channel, sample);
-			
-			//how to synthesize noise
-			data = random.nextFloat() * 0.25f - 0.125f;
-			data *= volumeVal;
-
-			//apply a delay
-			delayWriteIndex += 1;
-			if (delayWriteIndex >= (DELAYSIZE * delayVal)) {
-				delayWriteIndex = 0;
-			}
-			delayReadIndex = delayWriteIndex + 1;
-			if (delayReadIndex >= (DELAYSIZE * delayVal)) {
-				delayReadIndex = 0;
-			}
-			delay[channel][delayWriteIndex] = data + feedbackVal * delay[channel][delayReadIndex];
-			data = data + 0.5f * delay[channel][delayReadIndex];
-			buffer.setSample(channel, sample, data);
-		}
-	}
+    for (int i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
+        buffer.clear (i, 0, buffer.getNumSamples());
+	//https://forum.juce.com/t/using-the-audiobuffer-tutorial-method-in-processblock/19034/2
+	bufferToFill.buffer = &buffer;
+	bufferToFill.startSample = 0;
+	bufferToFill.numSamples = buffer.getNumSamples();
+	getNextAudioBlock(bufferToFill);
 }
 
 //==============================================================================
-bool Juce_vstAudioProcessor::hasEditor() const
+bool FileplayerAudioProcessor::hasEditor() const
 {
     return true; // (change this to false if you choose to not supply an editor)
 }
 
-AudioProcessorEditor* Juce_vstAudioProcessor::createEditor()
+AudioProcessorEditor* FileplayerAudioProcessor::createEditor()
 {
-    return new Juce_vstAudioProcessorEditor (*this);
+    return new FileplayerAudioProcessorEditor (*this);
 }
 
 //==============================================================================
-void Juce_vstAudioProcessor::getStateInformation (MemoryBlock& destData)
+void FileplayerAudioProcessor::getStateInformation (MemoryBlock& destData)
 {
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
 }
 
-void Juce_vstAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
+void FileplayerAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
@@ -207,5 +181,5 @@ void Juce_vstAudioProcessor::setStateInformation (const void* data, int sizeInBy
 // This creates new instances of the plugin..
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
-    return new Juce_vstAudioProcessor();
+    return new FileplayerAudioProcessor();
 }

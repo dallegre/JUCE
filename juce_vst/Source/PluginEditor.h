@@ -33,6 +33,8 @@ private:
     Juce_vstAudioProcessor& processor;
 
 	Slider volumeSlider;
+	Slider feedbackSlider;
+	Slider delaySlider;
 	void sliderValueChanged(Slider* slider) override;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Juce_vstAudioProcessorEditor)

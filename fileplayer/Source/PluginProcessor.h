@@ -12,18 +12,16 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
-#define DELAYSIZE 24000
-
 
 //==============================================================================
 /**
 */
-class Juce_vstAudioProcessor  : public AudioProcessor
+class FileplayerAudioProcessor  : public AudioProcessor
 {
 public:
     //==============================================================================
-    Juce_vstAudioProcessor();
-    ~Juce_vstAudioProcessor();
+    FileplayerAudioProcessor();
+    ~FileplayerAudioProcessor();
 
     //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
@@ -34,6 +32,10 @@ public:
    #endif
 
     void processBlock (AudioSampleBuffer&, MidiBuffer&) override;
+
+	void getNextAudioBlock(AudioSourceChannelInfo &bufferToFill);
+	//void prepareToPlay(double sampleRate, int samplesPerBlock);
+	//AudioProcessorEditor* createEditor();
 
     //==============================================================================
     AudioProcessorEditor* createEditor() override;
@@ -57,17 +59,13 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-	float volumeVal;
-	float feedbackVal;
-	float delayVal;
-	Random random;
-	//just for fun
-	//const int DELAYSIZE = 2.0 * int(juce::AudioProcessor::getSampleRate());
-	float delay[2][DELAYSIZE];
-	int delayReadIndex;
-	int delayWriteIndex;
+	AudioTransportSource transportSource;
+	AudioFormatManager formatManager;
+	ScopedPointer<AudioFormatReaderSource> readerSource;
+	AudioSourceChannelInfo bufferToFill;
 
 private:
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Juce_vstAudioProcessor)
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(FileplayerAudioProcessor)
+
 };
