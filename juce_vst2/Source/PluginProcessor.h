@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include "Delay.h"
+
 #include "../JuceLibraryCode/JuceHeader.h"
 
 
@@ -57,7 +59,13 @@ public:
 
 	//variable to handle the volume control.  Not sure about making it public
 	float volumeVal;
+	float wetVal;
+	float feedbackVal;
+	float delayVal;
 	Random random;
+	//just for fun
+	//const int DELAYSIZE = 2.0 * int(juce::AudioProcessor::getSampleRate());
+	Delay delay;
 
 private:
     //==============================================================================

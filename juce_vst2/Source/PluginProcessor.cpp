@@ -90,7 +90,10 @@ void Juce_vst2AudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
 	volumeVal = 0.5;
-	
+	wetVal = 0.5;
+	feedbackVal = 0.5;
+	delayVal = 0.5;
+	delay.prepareToPlay();
 }
 
 void Juce_vst2AudioProcessor::releaseResources()
@@ -125,35 +128,45 @@ bool Juce_vst2AudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts
 
 void Juce_vst2AudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
 {
-    const int totalNumInputChannels  = getTotalNumInputChannels();
-    const int totalNumOutputChannels = getTotalNumOutputChannels();
+	const int totalNumInputChannels = getTotalNumInputChannels();
+	const int totalNumOutputChannels = getTotalNumOutputChannels();
 
-    // In case we have more outputs than inputs, this code clears any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming feedback
-    // when they first compile a plugin, but obviously you don't need to keep
-    // this code if your algorithm always overwrites all the output channels.
+	// In case we have more outputs than inputs, this code clears any output
+	// channels that didn't contain input data, (because these aren't
+	// guaranteed to be empty - they may contain garbage).
+	// This is here to avoid people getting screaming feedback
+	// when they first compile a plugin, but obviously you don't need to keep
+	// this code if your algorithm always overwrites all the output channels.
 	for (int i = totalNumInputChannels; i < totalNumOutputChannels; ++i) {
 
 		buffer.clear(i, 0, buffer.getNumSamples());
 
 	}
 
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    {
-        // ..do something to the data...
+	// This is the place where you'd normally do the guts of your plugin's
+	// audio processing...
+	for (int channel = 0; channel < totalNumInputChannels; ++channel)
+	{
+		// ..do something to the data...
 		for (int sample = 0; sample < buffer.getNumSamples(); ++sample) {
+
 			//this is how you get data from the inputs
 			float data = buffer.getSample(channel, sample);
+
 			//how to synthesize noise
-			data = random.nextFloat() * 0.25f - 0.125f;
+			//data = random.nextFloat() * 0.25f - 0.125f;
 			data *= volumeVal;
+
+			//apply a delay
+			delay.updateIndex(delayVal, channel);
+			delay.write(channel, (data + feedbackVal * delay.read(channel)));
+			data = data + wetVal * delay.read(channel);
+			delay.clearUnused(channel);
+
 			buffer.setSample(channel, sample, data);
+
 		}
-    }
+	}
 }
 
 //==============================================================================
