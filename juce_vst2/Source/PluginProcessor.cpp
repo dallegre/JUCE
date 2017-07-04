@@ -161,7 +161,7 @@ void Juce_vst2AudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffe
 			delay.updateIndex(delayVal, channel);
 			delay.write(channel, (data + feedbackVal * delay.read(channel)));
 			data = data + wetVal * delay.read(channel);
-			delay.clearUnused(channel);
+			//delay.clearUnused(channel);
 
 			buffer.setSample(channel, sample, data);
 
