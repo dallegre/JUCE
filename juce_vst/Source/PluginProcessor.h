@@ -76,6 +76,7 @@ public:
 	//just for fun
 	//const int DELAYSIZE = 2.0 * int(juce::AudioProcessor::getSampleRate());
 	Delay delay, delay2, delay3, delay4;
+	OnePoleLp damping;
 
 private:
     //==============================================================================

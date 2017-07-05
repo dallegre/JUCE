@@ -89,19 +89,19 @@ void Juce_vstAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
-	dryVal = 0.8f;
+	dryVal = 1.0f;
 	wetVal = 0.5f;
 	timeVal = 0.9f;
 
 	feedbackVal = 0.0f;
-	delayVal = 0.5f;
+	delayVal = 0.6f;
 	oscAmtVal = 0.4f;
 	oscFreqVal = 0.1f;
 	
-	feedback2Val = 0.2f;
+	feedback2Val = 0.7f;
 	delay2Val = 0.3f;
-	oscAmt2Val = 0.0f;
-	oscFreq2Val = 0.0f;
+	oscAmt2Val = 0.5f;
+	oscFreq2Val = 0.3f;
 
 	feedback = 0.0f;
 	
@@ -109,6 +109,8 @@ void Juce_vstAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
 	delay2.prepareToPlay();
 	delay3.prepareToPlay();
 	delay4.prepareToPlay();
+
+	damping.setFc(6000.0f / (48000));
 }
 
 void Juce_vstAudioProcessor::releaseResources()
@@ -176,7 +178,7 @@ void Juce_vstAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuffer&
 			float oscFreqValScaled =  10.0f * oscFreqVal;				//frequency (roughly) of modulation
 			float oscAmtVal2Scaled =  100.0f * oscAmt2Val;				//amount in samples of modulation
 			float oscFreqVal2Scaled = 10.0f * oscFreq2Val;				//frequency (roughly) of modulation
-			float timeValScaled =     0.95  * timeVal;
+			float timeValScaled =     1.0f  * timeVal;
 
 			float feedback1, feedback2, feedback3, feedback4;
 			float apout1, apout2, apout3, apout4;
@@ -197,17 +199,17 @@ void Juce_vstAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuffer&
 			//just do arbitrary constants for the other 2 allpass filters.
 			delay3.updateIndex(.83, 60.0f, 0.3f, channel);
 			feedback3 = apout2 + 0.8f * delay3.read(channel);
-			delay3.write(channel, feedback3);
+			delay3.write(channel, feedback3); 
 			apout3 = delay3.read(channel) - 0.8f * feedback3;
 
-			delay4.updateIndex(.55, 55.0f, 0.7f, channel);
+			delay4.updateIndex(.65, 55.0f, 0.7f, channel);
 			feedback4 = apout3 + 0.7f * delay4.read(channel);
 			delay4.write(channel, feedback4);
 			apout4 = delay4.read(channel) - 0.7f * feedback4;
 			
-			feedback = apout4;
+			feedback = damping.process(apout4);
 			
-			data = dryVal * data*4.0f - wetVal * apout4*4.0f;
+			data = dryVal * data*4.0f - wetVal * (apout4*2.0f + apout3 * apout2/2.0f + apout1/3.0f);
 
 			buffer.setSample(channel, sample, data);
 
