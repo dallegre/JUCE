@@ -34,10 +34,18 @@ private:
 
 	Slider drySlider;
 	Slider wetSlider;
+	Slider timeSlider;
+
 	Slider feedbackSlider;
 	Slider delaySlider;
 	Slider oscFreqSlider;
 	Slider oscAmtSlider;
+
+	Slider feedback2Slider;
+	Slider delay2Slider;
+	Slider oscFreq2Slider;
+	Slider oscAmt2Slider;
+
 	void sliderValueChanged(Slider* slider) override;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Juce_vstAudioProcessorEditor)

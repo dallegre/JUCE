@@ -2,7 +2,7 @@
 
 #include "DSP.h"
 
-#define DELAYSIZE 24000
+#define DELAYSIZE 5000
 
 class Delay {
 

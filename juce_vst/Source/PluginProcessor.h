@@ -56,16 +56,26 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+	float feedback;
+
 	float dryVal;
 	float wetVal;
+	float timeVal;
+
 	float feedbackVal;
 	float delayVal;
 	float oscAmtVal;
 	float oscFreqVal;
+
+	float feedback2Val;
+	float delay2Val;
+	float oscAmt2Val;
+	float oscFreq2Val;
+
 	Random random;
 	//just for fun
 	//const int DELAYSIZE = 2.0 * int(juce::AudioProcessor::getSampleRate());
-	Delay delay;
+	Delay delay, delay2, delay3, delay4;
 
 private:
     //==============================================================================
