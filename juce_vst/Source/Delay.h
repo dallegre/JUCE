@@ -104,6 +104,13 @@ public:
 		return (y1*(1.0f - frac) + y2*frac);
 	}
 
+
+	float cosinterp(float y1, float y2, float frac) {
+		float frac2;
+		frac2 = (1 - cos(frac*float(3.14159))) / 2;
+		return(y1*(1 - frac2) + y2*frac2);
+	}
+
 private:
 
 	//actual delay buffer

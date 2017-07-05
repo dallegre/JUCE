@@ -103,14 +103,15 @@ void Juce_vstAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
 	oscAmt2Val = 0.5f;
 	oscFreq2Val = 0.3f;
 
-	feedback = 0.0f;
+	feedback[0] = 0.0f;
+	feedback[1] = 0.0f;
 	
 	delay.prepareToPlay();
 	delay2.prepareToPlay();
 	delay3.prepareToPlay();
 	delay4.prepareToPlay();
 
-	damping.setFc(6000.0f / (48000));
+	damping.setFc(3000.0f / (48000));
 }
 
 void Juce_vstAudioProcessor::releaseResources()
@@ -183,12 +184,12 @@ void Juce_vstAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuffer&
 			float feedback1, feedback2, feedback3, feedback4;
 			float apout1, apout2, apout3, apout4;
 
-			data *= 0.25f;
+			data *= 0.125f;
 
 			//first two allpass filters are controlled by the user
 			delay.updateIndex(delayVal, oscAmtValScaled, oscFreqValScaled, channel);
 			feedback1 = data + feedbackVal * delay.read(channel);
-			delay.write(channel, (feedback1 + feedback * timeValScaled));
+			delay.write(channel, (feedback1 + feedback[channel] * timeValScaled));
 			apout1 = delay.read(channel) - feedbackVal * feedback1;
 			
 			delay2.updateIndex(delay2Val, oscAmtVal2Scaled, oscFreqVal2Scaled, channel);
@@ -197,19 +198,21 @@ void Juce_vstAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuffer&
 			apout2 = delay2.read(channel) - feedback2Val * feedback2;
 			
 			//just do arbitrary constants for the other 2 allpass filters.
-			delay3.updateIndex(.83, 60.0f, 0.3f, channel);
+			delay3.updateIndex(.83, 70.0f, 0.3f, channel);
 			feedback3 = apout2 + 0.8f * delay3.read(channel);
 			delay3.write(channel, feedback3); 
 			apout3 = delay3.read(channel) - 0.8f * feedback3;
 
-			delay4.updateIndex(.65, 55.0f, 0.7f, channel);
-			feedback4 = apout3 + 0.7f * delay4.read(channel);
+			delay4.updateIndex(.65, 55.0f, 0.6f, channel);
+			feedback4 = apout3 + 0.2f * delay4.read(channel);
 			delay4.write(channel, feedback4);
-			apout4 = delay4.read(channel) - 0.7f * feedback4;
+			apout4 = delay4.read(channel) - 0.2f * feedback4;
 			
-			feedback = damping.process(apout4);
+			feedback[channel] = apout4;
 			
-			data = dryVal * data*4.0f - wetVal * (apout4*2.0f + apout3 * apout2/2.0f + apout1/3.0f);
+			//data = dryVal * data*4.0f - wetVal * (apout4*2.0f + apout3 * apout2/2.0f + apout1/3.0f);
+
+			data = dryVal * data*8.0f - wetVal * (apout3*8.0f);
 
 			buffer.setSample(channel, sample, data);
 

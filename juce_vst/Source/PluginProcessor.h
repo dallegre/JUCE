@@ -56,7 +56,7 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-	float feedback;
+	float feedback[2];
 
 	float dryVal;
 	float wetVal;
