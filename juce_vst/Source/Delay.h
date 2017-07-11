@@ -13,13 +13,13 @@ public:
 	~Delay(void) {}
 
 	//if you shortened the delay length, you'll want to clear the samples that you just decided to take out
-	void clearUnused(int channel) {
+	void clearUnused(void) {
 
 		if (delaySizeOld > delaySize) {
 			for (int i = delaySize; i < delaySizeOld; i++) {
 				//make sure you don't go out of bounds.
 				if (i < DELAYSIZE) {
-					delay[channel][i] = 0.0f;
+					delay[i] = 0.0f;
 				}
 			}
 		}
@@ -32,10 +32,8 @@ public:
 	void prepareToPlay(void) {
 
 		//initialize all variables
-		delayWriteIndex[0] = 0;
-		delayWriteIndex[1] = 0;
-		delayReadIndex[0] = 0;
-		delayReadIndex[1] = 0;
+		delayWriteIndex = 0;
+		delayReadIndex = 0;
 		delaySize = 0;
 		delaySizeOld = 0;
 
@@ -44,9 +42,7 @@ public:
 
 		//clear the delay buffer
 		for (int i = 0; i < DELAYSIZE; i++) {
-			for (int lr = 0; lr < 2; lr++) {
-				delay[lr][i] = 0.0f;
-			}
+			delay[i] = 0.0f;
 		}
 
 		//filter for smoothing the delay time control
@@ -55,15 +51,15 @@ public:
 	}
 
 	//update index.  operates on delayReadIndex and delayWJriteIndex, which are arrays of 2 for left/right indeces.
-	void updateIndex(float delayVal, float modAmt, float modFreq, int channel) {
+	void updateIndex(float delayVal, float modAmt, float modFreq) {
 
-		delayWriteIndex[channel]++;
-		delayReadIndex[channel]++;
-		if (delayWriteIndex[channel] >= DELAYSIZE) {
-			delayWriteIndex[channel] = 0;
+		delayWriteIndex++;
+		delayReadIndex++;
+		if (delayWriteIndex >= DELAYSIZE) {
+			delayWriteIndex = 0;
 		}
-		if (delayReadIndex[channel] >= DELAYSIZE) {
-			delayReadIndex[channel] = 0;
+		if (delayReadIndex >= DELAYSIZE) {
+			delayReadIndex = 0;
 		}
 
 		delaySize = float(DELAYSIZE) - float(DELAYSIZE) * delayVal;
@@ -73,20 +69,20 @@ public:
 		delaySizeFrac = delaySize - int(delaySize);
 
 
-		delayReadIndex[channel] = delayWriteIndex[channel] + int(delaySize);
-		if (delayReadIndex[channel] >= DELAYSIZE) {
-			delayReadIndex[channel] = delayWriteIndex[channel] + int(delaySize) - DELAYSIZE;
+		delayReadIndex = delayWriteIndex + int(delaySize);
+		if ((delayReadIndex >= DELAYSIZE) && (delayReadIndex >= 0)) {
+			delayReadIndex = delayWriteIndex + int(delaySize) - DELAYSIZE;
 		}
 
 	}
 
-	float read(int channel) {
-		if (delayReadIndex[channel] < DELAYSIZE) {
-			if (delayReadIndex[channel] + 1 < DELAYSIZE) {
-				return linterp(delay[channel][delayReadIndex[channel]], delay[channel][delayReadIndex[channel] + 1], delaySizeFrac);
+	float read(void) {
+		if ((delayReadIndex < DELAYSIZE) && (delayReadIndex >= 0)) {
+			if (delayReadIndex + 1 < DELAYSIZE) {
+				return linterp(delay[delayReadIndex], delay[delayReadIndex + 1], delaySizeFrac);
 			}
 			else {
-				return delay[channel][delayReadIndex[channel]];
+				return delay[delayReadIndex];
 			}
 		}
 		else {
@@ -94,9 +90,9 @@ public:
 		}
 	}
 
-	void write(int channel, float input) {
-		if (delayWriteIndex[channel] < DELAYSIZE) {
-			delay[channel][delayWriteIndex[channel]] = input;
+	void write(float input) {
+		if ((delayWriteIndex < DELAYSIZE) && (delayWriteIndex >= 0)) {
+			delay[delayWriteIndex] = input;
 		}
 	}
 
@@ -114,10 +110,10 @@ public:
 private:
 
 	//actual delay buffer
-	float delay[2][DELAYSIZE];
+	float delay[DELAYSIZE];
 
-	int delayReadIndex[2];
-	int delayWriteIndex[2];
+	int delayReadIndex;
+	int delayWriteIndex;
 
 	//counting on a reasonable conversion from float to int
 	float delaySize;

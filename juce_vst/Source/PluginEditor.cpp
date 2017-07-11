@@ -146,6 +146,14 @@ void Juce_vstAudioProcessorEditor::sliderValueChanged(Slider* slider) {
 	processor.delay2Val =    delay2Slider.getValue();
 	processor.oscAmt2Val =   oscAmt2Slider.getValue();
 	processor.oscFreq2Val =  oscFreq2Slider.getValue();
+
+	processor.oscAmtValScaled = 100.0f * processor.oscAmtVal;				//amount in samples of modulation
+	processor.oscFreqValScaled = 10.0f * processor.oscFreqVal;				//frequency (roughly) of modulation
+	processor.oscAmtVal2Scaled = 100.0f * processor.oscAmt2Val;				//amount in samples of modulation
+	processor.oscFreqVal2Scaled = 10.0f * processor.oscFreq2Val;				//frequency (roughly) of modulation
+	processor.timeValScaled = 1.0f  * processor.timeVal;
+
+
 }
 
 Juce_vstAudioProcessorEditor::~Juce_vstAudioProcessorEditor()

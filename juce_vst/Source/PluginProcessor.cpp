@@ -103,13 +103,23 @@ void Juce_vstAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
 	oscAmt2Val = 0.5f;
 	oscFreq2Val = 0.3f;
 
+	oscAmtValScaled = 100.0f * oscAmtVal;				//amount in samples of modulation
+	oscFreqValScaled = 10.0f * oscFreqVal;				//frequency (roughly) of modulation
+	oscAmtVal2Scaled = 100.0f * oscAmt2Val;				//amount in samples of modulation
+	oscFreqVal2Scaled = 10.0f * oscFreq2Val;				//frequency (roughly) of modulation
+	timeValScaled = 1.0f  * timeVal;
+
 	feedback[0] = 0.0f;
 	feedback[1] = 0.0f;
 	
-	delay.prepareToPlay();
-	delay2.prepareToPlay();
-	delay3.prepareToPlay();
-	delay4.prepareToPlay();
+	allpass[0].prepareToPlay();
+	allpass2[0].prepareToPlay();
+	allpass3[0].prepareToPlay();
+	allpass4[0].prepareToPlay();
+	allpass[1].prepareToPlay();
+	allpass2[1].prepareToPlay();
+	allpass3[1].prepareToPlay();
+	allpass4[1].prepareToPlay();
 
 	damping.setFc(3000.0f / (48000));
 }
@@ -175,11 +185,6 @@ void Juce_vstAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuffer&
 			//data = random.nextFloat() * 0.25f - 0.125f;
 
 			//apply a delay
-			float oscAmtValScaled =   100.0f * oscAmtVal;				//amount in samples of modulation
-			float oscFreqValScaled =  10.0f * oscFreqVal;				//frequency (roughly) of modulation
-			float oscAmtVal2Scaled =  100.0f * oscAmt2Val;				//amount in samples of modulation
-			float oscFreqVal2Scaled = 10.0f * oscFreq2Val;				//frequency (roughly) of modulation
-			float timeValScaled =     1.0f  * timeVal;
 
 			float feedback1, feedback2, feedback3, feedback4;
 			float apout1, apout2, apout3, apout4;
@@ -187,32 +192,28 @@ void Juce_vstAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuffer&
 			data *= 0.125f;
 
 			//first two allpass filters are controlled by the user
-			delay.updateIndex(delayVal, oscAmtValScaled, oscFreqValScaled, channel);
-			feedback1 = data + feedbackVal * delay.read(channel);
-			delay.write(channel, (feedback1 + feedback[channel] * timeValScaled));
-			apout1 = delay.read(channel) - feedbackVal * feedback1;
-			
-			delay2.updateIndex(delay2Val, oscAmtVal2Scaled, oscFreqVal2Scaled, channel);
-			feedback2 = apout1 + feedback2Val * delay2.read(channel);
-			delay2.write(channel, feedback2);
-			apout2 = delay2.read(channel) - feedback2Val * feedback2;
-			
-			//just do arbitrary constants for the other 2 allpass filters.
-			delay3.updateIndex(.83, 70.0f, 0.3f, channel);
-			feedback3 = apout2 + 0.8f * delay3.read(channel);
-			delay3.write(channel, feedback3); 
-			apout3 = delay3.read(channel) - 0.8f * feedback3;
+			apout1 = allpass[channel].process((data - feedback[channel] * timeValScaled),
+				delayVal, oscAmtValScaled, oscFreqValScaled, feedbackVal);
 
-			delay4.updateIndex(.65, 55.0f, 0.6f, channel);
-			feedback4 = apout3 + 0.2f * delay4.read(channel);
-			delay4.write(channel, feedback4);
-			apout4 = delay4.read(channel) - 0.2f * feedback4;
+			apout2 = allpass2[channel].process(apout1, delay2Val, oscAmtVal2Scaled, oscFreqVal2Scaled, feedback2Val);
+
+			if (!channel) {
+				apout3 = allpass3[channel].process(apout2, .83, 70.0f, 0.3f, 0.8f);
+			}else {
+				apout3 = allpass3[channel].process(apout2, .73, 69.0f, 0.3f, 0.8f);
+			}
+
+			if (!channel) {
+				apout4 = allpass4[channel].process(apout3, .55, 54.0f, 0.6f, 0.2f);
+			}else {
+				apout4 = allpass4[channel].process(apout3, .65f, 54.0f, 0.6f, 0.2f);
+			}
 			
 			feedback[channel] = apout4;
 			
 			//data = dryVal * data*4.0f - wetVal * (apout4*2.0f + apout3 * apout2/2.0f + apout1/3.0f);
 
-			data = dryVal * data*8.0f - wetVal * (apout3*8.0f);
+			data = dryVal * data*8.0f - wetVal * (apout4*8.0f);
 
 			buffer.setSample(channel, sample, data);
 

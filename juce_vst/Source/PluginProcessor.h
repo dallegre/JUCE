@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "Delay.h"
+#include "Allpass.h"
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
@@ -72,10 +72,16 @@ public:
 	float oscAmt2Val;
 	float oscFreq2Val;
 
+	float oscAmtValScaled;				//amount in samples of modulation
+	float oscFreqValScaled;				//frequency (roughly) of modulation
+	float oscAmtVal2Scaled;				//amount in samples of modulation
+	float oscFreqVal2Scaled;			//frequency (roughly) of modulation
+	float timeValScaled;
+
 	Random random;
 	//just for fun
 	//const int DELAYSIZE = 2.0 * int(juce::AudioProcessor::getSampleRate());
-	Delay delay, delay2, delay3, delay4;
+	Allpass allpass[2], allpass2[2], allpass3[2], allpass4[2];
 	OnePoleLp damping;
 
 private:
