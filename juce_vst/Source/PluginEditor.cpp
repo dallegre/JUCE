@@ -161,7 +161,7 @@ void Juce_vstAudioProcessorEditor::sliderValueChanged(Slider* slider) {
 	processor.oscFreqValScaled =  5.0f  * processor.oscFreqVal;				//frequency (roughly) of modulation
 	processor.oscAmtVal2Scaled =  50.0f * processor.oscAmt2Val;				//amount in samples of modulation
 	processor.oscFreqVal2Scaled = 5.0f  * processor.oscFreq2Val;			//frequency (roughly) of modulation
-	processor.timeValScaled =     1.0f  * processor.timeVal;
+	processor.timeValScaled =     1.0f  * pow(processor.timeVal, 0.5f);
 	processor.dampValScaled =     16000.0f  * pow(processor.dampVal, 2.0f) / 48000;
 
 	processor.damping[0].setFc(processor.dampValScaled);

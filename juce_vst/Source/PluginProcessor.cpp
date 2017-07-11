@@ -104,11 +104,11 @@ void Juce_vstAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
 	oscAmt2Val = 0.5f;
 	oscFreq2Val = 0.3f;
 
-	oscAmtValScaled = 50.0f * oscAmtVal;				//amount in samples of modulation
-	oscFreqValScaled = 5.0f * oscFreqVal;				//frequency (roughly) of modulation
+	oscAmtValScaled = 50.0f  * oscAmtVal;				//amount in samples of modulation
+	oscFreqValScaled = 5.0f  * oscFreqVal;				//frequency (roughly) of modulation
 	oscAmtVal2Scaled = 50.0f * oscAmt2Val;				//amount in samples of modulation
 	oscFreqVal2Scaled = 5.0f * oscFreq2Val;				//frequency (roughly) of modulation
-	timeValScaled = 1.0f * timeVal;
+	timeValScaled = 1.0f     * pow(timeVal, 0.5f);
 	dampValScaled = 16000.0f * pow(dampVal, 2.0f) / 48000;
 
 	feedback[0] = 0.0f;
@@ -218,9 +218,9 @@ void Juce_vstAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuffer&
 			
 			//Send the taps slightly differently for left and right.  Ping ponging isn't yet working.
 			if (!channel) {
-				data = (dryVal * data * 4.0f) - (apout4*2.0f + apout3 * apout2 / 2.0f + apout1 / 2.9f);
+				data = (dryVal * data * 4.0f) - (apout4*4.0f + apout3 + apout2 / 2.0f + apout1 / 2.9f);
 			}else{
-				data = (dryVal * data * 4.0f) - (apout4*2.0f + apout3 * apout2 / 2.1f + apout1 / 3.0f);
+				data = (dryVal * data * 4.0f) - (apout4*4.0f + apout3 + apout2 / 2.1f + apout1 / 3.0f);
 			}
 
 			//this is how you can send data to outputs
