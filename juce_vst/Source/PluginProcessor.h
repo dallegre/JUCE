@@ -61,6 +61,7 @@ public:
 	float dryVal;
 	float wetVal;
 	float timeVal;
+	float dampVal;
 
 	float feedbackVal;
 	float delayVal;
@@ -77,12 +78,13 @@ public:
 	float oscAmtVal2Scaled;				//amount in samples of modulation
 	float oscFreqVal2Scaled;			//frequency (roughly) of modulation
 	float timeValScaled;
+	float dampValScaled;
 
 	Random random;
 	//just for fun
 	//const int DELAYSIZE = 2.0 * int(juce::AudioProcessor::getSampleRate());
 	Allpass allpass[2], allpass2[2], allpass3[2], allpass4[2];
-	OnePoleLp damping;
+	OnePoleLp damping[2];
 
 private:
     //==============================================================================

@@ -18,7 +18,7 @@ Juce_vstAudioProcessorEditor::Juce_vstAudioProcessorEditor (Juce_vstAudioProcess
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-	setSize(450, 300);
+	setSize(500, 300);
 	setResizable(false, true);
 
 	//the constructor gets called every time you click on the plugin so initialize everything at prepare to play
@@ -43,6 +43,13 @@ Juce_vstAudioProcessorEditor::Juce_vstAudioProcessorEditor (Juce_vstAudioProcess
 	timeSlider.setPopupDisplayEnabled(true, this);
 	timeSlider.setTextValueSuffix(" Dec");
 	timeSlider.setValue(processor.timeVal);
+
+	dampSlider.setSliderStyle(Slider::LinearBarVertical);
+	dampSlider.setRange(0.0, 1.0, 0.01);
+	dampSlider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
+	dampSlider.setPopupDisplayEnabled(true, this);
+	dampSlider.setTextValueSuffix(" Damp");
+	dampSlider.setValue(processor.timeVal);
 
 	feedbackSlider.setSliderStyle(Slider::LinearBarVertical);
 	feedbackSlider.setRange(0.0, 1.0, 0.01);
@@ -104,6 +111,7 @@ Juce_vstAudioProcessorEditor::Juce_vstAudioProcessorEditor (Juce_vstAudioProcess
 	addAndMakeVisible(&drySlider);
 	addAndMakeVisible(&wetSlider);
 	addAndMakeVisible(&timeSlider);
+	addAndMakeVisible(&dampSlider);
 
 	addAndMakeVisible(&feedbackSlider);
 	addAndMakeVisible(&delaySlider);
@@ -119,6 +127,7 @@ Juce_vstAudioProcessorEditor::Juce_vstAudioProcessorEditor (Juce_vstAudioProcess
 	drySlider.addListener(this);
 	wetSlider.addListener(this);
 	timeSlider.addListener(this);
+	dampSlider.addListener(this);
 
 	feedbackSlider.addListener(this);
 	delaySlider.addListener(this);
@@ -136,6 +145,7 @@ void Juce_vstAudioProcessorEditor::sliderValueChanged(Slider* slider) {
 	processor.dryVal =       drySlider.getValue();
 	processor.wetVal =       wetSlider.getValue();
 	processor.timeVal =      timeSlider.getValue();
+	processor.dampVal =      dampSlider.getValue();
 
 	processor.feedbackVal =  feedbackSlider.getValue();
 	processor.delayVal =     delaySlider.getValue();
@@ -147,12 +157,15 @@ void Juce_vstAudioProcessorEditor::sliderValueChanged(Slider* slider) {
 	processor.oscAmt2Val =   oscAmt2Slider.getValue();
 	processor.oscFreq2Val =  oscFreq2Slider.getValue();
 
-	processor.oscAmtValScaled = 100.0f * processor.oscAmtVal;				//amount in samples of modulation
-	processor.oscFreqValScaled = 10.0f * processor.oscFreqVal;				//frequency (roughly) of modulation
-	processor.oscAmtVal2Scaled = 100.0f * processor.oscAmt2Val;				//amount in samples of modulation
-	processor.oscFreqVal2Scaled = 10.0f * processor.oscFreq2Val;				//frequency (roughly) of modulation
-	processor.timeValScaled = 1.0f  * processor.timeVal;
+	processor.oscAmtValScaled =   50.0f * processor.oscAmtVal;				//amount in samples of modulation
+	processor.oscFreqValScaled =  5.0f  * processor.oscFreqVal;				//frequency (roughly) of modulation
+	processor.oscAmtVal2Scaled =  50.0f * processor.oscAmt2Val;				//amount in samples of modulation
+	processor.oscFreqVal2Scaled = 5.0f  * processor.oscFreq2Val;			//frequency (roughly) of modulation
+	processor.timeValScaled =     1.0f  * processor.timeVal;
+	processor.dampValScaled =     16000.0f  * pow(processor.dampVal, 2.0f) / 48000;
 
+	processor.damping[0].setFc(processor.dampValScaled);
+	processor.damping[1].setFc(processor.dampValScaled);
 
 }
 
@@ -166,7 +179,7 @@ void Juce_vstAudioProcessorEditor::paint (Graphics& g)
     // (Our component is opaque, so we must completely fill the background with a solid colour)
 	g.fillAll(Colours::white);
 
-	g.setColour(Colours::black);
+	g.setColour(Colours::darkgrey);
 	g.setFont(15.0f);
 
 	g.drawFittedText("Master", 30,  0, getWidth(), 30, Justification::bottom, 1);
@@ -174,38 +187,39 @@ void Juce_vstAudioProcessorEditor::paint (Graphics& g)
 	g.drawFittedText("Dry",  30,  30, getWidth(), 30, Justification::bottom, 1);
 	g.drawFittedText("Wet",  60,  30, getWidth(), 30, Justification::bottom, 1);
 	g.drawFittedText("Dec",  90,  30, getWidth(), 30, Justification::bottom, 1);
+	g.drawFittedText("Damp", 120, 30, getWidth(), 30, Justification::bottom, 1);
 
+	g.drawFittedText("Allpass1", 180, 0, getWidth(), 30, Justification::bottom, 1);
 
-	g.drawFittedText("Allpass1", 150, 0, getWidth(), 30, Justification::bottom, 1);
+	g.drawFittedText("Fbk",  180, 30, getWidth(),  30, Justification::bottom, 1);
+	g.drawFittedText("Del",  210, 30, getWidth(),  30, Justification::bottom, 1);
+	g.drawFittedText("Mod",  240, 30, getWidth(),  30, Justification::bottom, 1);
+	g.drawFittedText("Freq", 270, 30, getWidth(),  30, Justification::bottom, 1);
 
-	g.drawFittedText("Fbk",  150, 30, getWidth(),  30, Justification::bottom, 1);
-	g.drawFittedText("Del",  180, 30, getWidth(),  30, Justification::bottom, 1);
-	g.drawFittedText("Mod",  210, 30, getWidth(),  30, Justification::bottom, 1);
-	g.drawFittedText("Freq", 240, 30, getWidth(),  30, Justification::bottom, 1);
+	g.drawFittedText("Allpass2", 330, 0, getWidth(), 30, Justification::bottom, 1);
 
-	g.drawFittedText("Allpass2", 300, 0, getWidth(), 30, Justification::bottom, 1);
-
-	g.drawFittedText("Fbk",  300, 30, getWidth(),  30, Justification::bottom, 1);
-	g.drawFittedText("Del",  330, 30, getWidth(),  30, Justification::bottom, 1);
-	g.drawFittedText("Mod",  360, 30, getWidth(),  30, Justification::bottom, 1);
-	g.drawFittedText("Freq", 390, 30, getWidth(),  30, Justification::bottom, 1);
+	g.drawFittedText("Fbk",  330, 30, getWidth(),  30, Justification::bottom, 1);
+	g.drawFittedText("Del",  360, 30, getWidth(),  30, Justification::bottom, 1);
+	g.drawFittedText("Mod",  390, 30, getWidth(),  30, Justification::bottom, 1);
+	g.drawFittedText("Freq", 420, 30, getWidth(),  30, Justification::bottom, 1);
 }
 
 void Juce_vstAudioProcessorEditor::resized()
 {
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
-	drySlider.setBounds     (30,   60, 20, getHeight() - 90);
-	wetSlider.setBounds     (60,   60, 20, getHeight() - 90);
-	timeSlider.setBounds    (90,   60, 20, getHeight() - 90);
+	drySlider.setBounds      (30,   60, 20, getHeight() - 90);
+	wetSlider.setBounds      (60,   60, 20, getHeight() - 90);
+	timeSlider.setBounds     (90,   60, 20, getHeight() - 90);
+	dampSlider.setBounds     (120,  60, 20, getHeight() - 90);
 	
-	feedbackSlider.setBounds(150,  60, 20, getHeight() - 90);
-	delaySlider.setBounds   (180,  60, 20, getHeight() - 90);
-	oscAmtSlider.setBounds  (210,  60, 20, getHeight() - 90);
-	oscFreqSlider.setBounds (240,  60, 20, getHeight() - 90);
+	feedbackSlider.setBounds (180,  60, 20, getHeight() - 90);
+	delaySlider.setBounds    (210,  60, 20, getHeight() - 90);
+	oscAmtSlider.setBounds   (240,  60, 20, getHeight() - 90);
+	oscFreqSlider.setBounds  (270,  60, 20, getHeight() - 90);
 	
-	feedback2Slider.setBounds(300, 60, 20, getHeight() - 90);
-	delay2Slider.setBounds   (330, 60, 20, getHeight() - 90);
-	oscAmt2Slider.setBounds  (360, 60, 20, getHeight() - 90);
-	oscFreq2Slider.setBounds (390, 60, 20, getHeight() - 90);
+	feedback2Slider.setBounds(330,  60, 20, getHeight() - 90);
+	delay2Slider.setBounds   (360,  60, 20, getHeight() - 90);
+	oscAmt2Slider.setBounds  (390,  60, 20, getHeight() - 90);
+	oscFreq2Slider.setBounds (420,  60, 20, getHeight() - 90);
 }

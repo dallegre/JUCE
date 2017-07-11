@@ -35,6 +35,7 @@ private:
 	Slider drySlider;
 	Slider wetSlider;
 	Slider timeSlider;
+	Slider dampSlider;
 
 	Slider feedbackSlider;
 	Slider delaySlider;

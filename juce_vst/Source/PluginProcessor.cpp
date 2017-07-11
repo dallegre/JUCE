@@ -92,8 +92,9 @@ void Juce_vstAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
 	dryVal = 1.0f;
 	wetVal = 0.5f;
 	timeVal = 0.9f;
+	dampVal = 0.5f;
 
-	feedbackVal = 0.0f;
+	feedbackVal = 0.5f;
 	delayVal = 0.6f;
 	oscAmtVal = 0.4f;
 	oscFreqVal = 0.1f;
@@ -103,11 +104,12 @@ void Juce_vstAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
 	oscAmt2Val = 0.5f;
 	oscFreq2Val = 0.3f;
 
-	oscAmtValScaled = 100.0f * oscAmtVal;				//amount in samples of modulation
-	oscFreqValScaled = 10.0f * oscFreqVal;				//frequency (roughly) of modulation
-	oscAmtVal2Scaled = 100.0f * oscAmt2Val;				//amount in samples of modulation
-	oscFreqVal2Scaled = 10.0f * oscFreq2Val;				//frequency (roughly) of modulation
-	timeValScaled = 1.0f  * timeVal;
+	oscAmtValScaled = 50.0f * oscAmtVal;				//amount in samples of modulation
+	oscFreqValScaled = 5.0f * oscFreqVal;				//frequency (roughly) of modulation
+	oscAmtVal2Scaled = 50.0f * oscAmt2Val;				//amount in samples of modulation
+	oscFreqVal2Scaled = 5.0f * oscFreq2Val;				//frequency (roughly) of modulation
+	timeValScaled = 1.0f * timeVal;
+	dampValScaled = 16000.0f * pow(dampVal, 2.0f) / 48000;
 
 	feedback[0] = 0.0f;
 	feedback[1] = 0.0f;
@@ -121,7 +123,8 @@ void Juce_vstAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
 	allpass3[1].prepareToPlay();
 	allpass4[1].prepareToPlay();
 
-	damping.setFc(3000.0f / (48000));
+	damping[0].setFc(dampValScaled);
+	damping[1].setFc(dampValScaled);
 }
 
 void Juce_vstAudioProcessor::releaseResources()
@@ -184,19 +187,20 @@ void Juce_vstAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuffer&
 			//how to synthesize noise
 			//data = random.nextFloat() * 0.25f - 0.125f;
 
-			//apply a delay
-
 			float feedback1, feedback2, feedback3, feedback4;
-			float apout1, apout2, apout3, apout4;
+			float apout1, apout2, apout3, apout4, scaledIn;
 
-			data *= 0.125f;
+			//scale the input a bit so you don't saturate as you go through the algorithm
+			data *= 0.25;
+			scaledIn = data * wetVal;
 
 			//first two allpass filters are controlled by the user
-			apout1 = allpass[channel].process((data - feedback[channel] * timeValScaled),
+			apout1 = allpass[channel].process((scaledIn - feedback[channel] * timeValScaled),
 				delayVal, oscAmtValScaled, oscFreqValScaled, feedbackVal);
 
 			apout2 = allpass2[channel].process(apout1, delay2Val, oscAmtVal2Scaled, oscFreqVal2Scaled, feedback2Val);
 
+			//2nd two allpass filters have constant parameters that differ slightly between left and right.
 			if (!channel) {
 				apout3 = allpass3[channel].process(apout2, .83, 70.0f, 0.3f, 0.8f);
 			}else {
@@ -208,13 +212,18 @@ void Juce_vstAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuffer&
 			}else {
 				apout4 = allpass4[channel].process(apout3, .65f, 54.0f, 0.6f, 0.2f);
 			}
-			
-			feedback[channel] = apout4;
-			
-			//data = dryVal * data*4.0f - wetVal * (apout4*2.0f + apout3 * apout2/2.0f + apout1/3.0f);
 
-			data = dryVal * data*8.0f - wetVal * (apout4*8.0f);
+			feedback[channel] = damping[channel].process(apout4);
+			//feedback[channel] = apout4;
+			
+			//Send the taps slightly differently for left and right.  Ping ponging isn't yet working.
+			if (!channel) {
+				data = (dryVal * data * 4.0f) - (apout4*2.0f + apout3 * apout2 / 2.0f + apout1 / 2.9f);
+			}else{
+				data = (dryVal * data * 4.0f) - (apout4*2.0f + apout3 * apout2 / 2.1f + apout1 / 3.0f);
+			}
 
+			//this is how you can send data to outputs
 			buffer.setSample(channel, sample, data);
 
 		}
