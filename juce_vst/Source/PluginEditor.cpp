@@ -49,7 +49,7 @@ Juce_vstAudioProcessorEditor::Juce_vstAudioProcessorEditor (Juce_vstAudioProcess
 	dampSlider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
 	dampSlider.setPopupDisplayEnabled(true, this);
 	dampSlider.setTextValueSuffix(" Damp");
-	dampSlider.setValue(processor.timeVal);
+	dampSlider.setValue(processor.dampVal);
 
 	feedbackSlider.setSliderStyle(Slider::LinearBarVertical);
 	feedbackSlider.setRange(0.0, 1.0, 0.01);
