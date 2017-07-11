@@ -51,7 +51,7 @@ public:
 	}
 
 	//update index.  operates on delayReadIndex and delayWJriteIndex, which are arrays of 2 for left/right indeces.
-	void updateIndex(float delayVal, float modAmt, float modFreq) {
+	void updateIndex(float delayVal, float modAmt, float modFreq, int quad) {
 
 		delayWriteIndex++;
 		delayReadIndex++;
@@ -65,7 +65,7 @@ public:
 		delaySize = float(DELAYSIZE) - float(DELAYSIZE) * delayVal;
 		delaySize = controlFilter.process(delaySize);
 		modOsc.setF(48000 * modFreq, modAmt);
-		delaySize += modOsc.process(0);
+		delaySize += modOsc.process(quad);
 		delaySizeFrac = delaySize - int(delaySize);
 
 

@@ -196,21 +196,21 @@ void Juce_vstAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuffer&
 
 			//first two allpass filters are controlled by the user
 			apout1 = allpass[channel].process((scaledIn - feedback[channel] * timeValScaled),
-				delayVal, oscAmtValScaled, oscFreqValScaled, feedbackVal);
+				delayVal, oscAmtValScaled, oscFreqValScaled, feedbackVal, channel);
 
-			apout2 = allpass2[channel].process(apout1, delay2Val, oscAmtVal2Scaled, oscFreqVal2Scaled, feedback2Val);
+			apout2 = allpass2[channel].process(apout1, delay2Val, oscAmtVal2Scaled, oscFreqVal2Scaled, feedback2Val, channel);
 
 			//2nd two allpass filters have constant parameters that differ slightly between left and right.
 			if (!channel) {
-				apout3 = allpass3[channel].process(apout2, .83, 70.0f, 0.3f, 0.8f);
+				apout3 = allpass3[channel].process(apout2, .83, 70.0f, 0.3f, 0.8f, channel);
 			}else {
-				apout3 = allpass3[channel].process(apout2, .73, 69.0f, 0.3f, 0.8f);
+				apout3 = allpass3[channel].process(apout2, .73, 69.0f, 0.3f, 0.8f, channel);
 			}
 
 			if (!channel) {
-				apout4 = allpass4[channel].process(apout3, .55, 54.0f, 0.6f, 0.2f);
+				apout4 = allpass4[channel].process(apout3, .55, 54.0f, 0.6f, 0.2f, channel);
 			}else {
-				apout4 = allpass4[channel].process(apout3, .65f, 54.0f, 0.6f, 0.2f);
+				apout4 = allpass4[channel].process(apout3, .65f, 54.0f, 0.6f, 0.2f, channel);
 			}
 
 			feedback[channel] = damping[channel].process(apout4);

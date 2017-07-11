@@ -9,8 +9,8 @@ public:
 	Allpass() {};
 	~Allpass() {};
 
-	float process(float input, float delayVal, float oscAmtValScaled, float oscFreqValScaled, float feedbackVal) {
-		delay.updateIndex(delayVal, oscAmtValScaled, oscFreqValScaled);
+	float process(float input, float delayVal, float oscAmtValScaled, float oscFreqValScaled, float feedbackVal, int quad) {
+		delay.updateIndex(delayVal, oscAmtValScaled, oscFreqValScaled, quad);
 		feedback = input + feedbackVal * delay.read();
 		delay.write(feedback);
 		return delay.read() - feedbackVal * feedback;

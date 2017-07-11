@@ -33,15 +33,15 @@ public:
 		yn = 0;					//initial condition sine(0) = 0
 		yq = 0;					//initial condition cos(0) = 1
 		yn_1 = 1, yq_1 = 0;     //hmm...
-		pi = 3.14159;
-		fs = 48000 * 0.1f;
+		pi = 3.14159f;
+		fs = 48000.0f * 0.1f;
 	}
 
 	~gsOsc() {};
 
 	void setF(float frequency, float amp) {
-		fw = float(2.0)*pi*frequency / fs;
-		eps = float(2.0)*sin(fw / float(2.0));
+		fw = 2.0f*pi*frequency / fs;
+		eps = 2.0f*sin(fw / 2.0f);
 		amp2 = amp;
 	}
 
@@ -50,10 +50,16 @@ public:
 		yn = eps*yq + yn_1;
 		yn_1 = yn;
 		yq_1 = yq;
-		if (quad)
-			return yn*amp2;
-		else
-			return yq*amp2;
+		//check to see if it's going crazy
+		if ((yq > 3.0f) || (yq < -3.0f)) {
+			yn = 0; yq = 0; yn_1 = 1; yq_1 = 0;
+			return 0;
+		}else{
+			if (quad)
+				return yn*amp2;
+			else
+				return yq*amp2;
+		}
 	}
 
 private:
