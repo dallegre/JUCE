@@ -51,7 +51,7 @@ public:
 		yn_1 = yn;
 		yq_1 = yq;
 		//check to see if it's going crazy
-		if ((yq > 3.0f) || (yq < -3.0f)) {
+		if ((yq > 2.0f) || (yq < -2.0f)) {
 			yn = 0; yq = 0; yn_1 = 1; yq_1 = 0;
 			return 0;
 		}else{

@@ -217,11 +217,15 @@ void Juce_vstAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuffer&
 			//feedback[channel] = apout4;
 			
 			//Send the taps slightly differently for left and right.  Ping ponging isn't yet working.
+			/*
 			if (!channel) {
 				data = (dryVal * data * 4.0f) - (apout4*4.0f + apout3 + apout2 / 2.0f + apout1 / 2.9f);
 			}else{
 				data = (dryVal * data * 4.0f) - (apout4*4.0f + apout3 + apout2 / 2.1f + apout1 / 3.0f);
 			}
+			*/
+
+			data = (dryVal * data * 4.0f) - (apout3 * 4.0f);
 
 			//this is how you can send data to outputs
 			buffer.setSample(channel, sample, data);

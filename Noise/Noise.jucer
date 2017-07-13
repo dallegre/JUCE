@@ -27,7 +27,6 @@
         <MODULEPATH id="juce_gui_basics" path="..\..\JUCE2\JUCE\modules"/>
         <MODULEPATH id="juce_gui_extra" path="..\..\JUCE2\JUCE\modules"/>
         <MODULEPATH id="juce_cryptography" path="..\..\JUCE2\JUCE\modules"/>
-        <MODULEPATH id="juce_video" path="..\..\JUCE2\JUCE\modules"/>
         <MODULEPATH id="juce_opengl" path="..\..\JUCE2\JUCE\modules"/>
         <MODULEPATH id="juce_audio_basics" path="..\..\JUCE2\JUCE\modules"/>
         <MODULEPATH id="juce_audio_devices" path="..\..\JUCE2\JUCE\modules"/>
@@ -51,7 +50,6 @@
     <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0"/>
     <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="0"/>
     <MODULE id="juce_opengl" showAllCode="1" useLocalCopy="0"/>
-    <MODULE id="juce_video" showAllCode="1" useLocalCopy="0"/>
   </MODULES>
   <JUCEOPTIONS/>
 </JUCERPROJECT>

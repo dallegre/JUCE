@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="MGWZsf" name="juce_vst" displaySplashScreen="1" reportAppUsage="1"
-              splashScreenColour="Dark" projectType="audioplug" version="1.0.0"
-              bundleIdentifier="com.yourcompany.juce_vst" includeBinaryInAppConfig="1"
+<JUCERPROJECT id="MGWZsf" name="reverb" displaySplashScreen="1" reportAppUsage="1"
+              splashScreenColour="Light" projectType="audioplug" version="1.0.0"
+              bundleIdentifier="com.yourcompany.reverb" includeBinaryInAppConfig="1"
               buildVST="1" buildVST3="0" buildAU="1" buildAUv3="0" buildRTAS="0"
-              buildAAX="0" buildStandalone="0" enableIAA="0" pluginName="juce_vst"
-              pluginDesc="juce_vst" pluginManufacturer="yourcompany" pluginManufacturerCode="Manu"
+              buildAAX="0" buildStandalone="0" enableIAA="0" pluginName="reverb"
+              pluginDesc="reverb" pluginManufacturer="yourcompany" pluginManufacturerCode="Manu"
               pluginCode="Mgwz" pluginChannelConfigs="" pluginIsSynth="0" pluginWantsMidiIn="0"
               pluginProducesMidiOut="0" pluginIsMidiEffectPlugin="0" pluginEditorRequiresKeys="0"
-              pluginAUExportPrefix="juce_vstAU" pluginRTASCategory="" aaxIdentifier="com.yourcompany.juce_vst"
+              pluginAUExportPrefix="reverbAU" pluginRTASCategory="" aaxIdentifier="com.yourcompany.reverb"
               pluginAAXCategory="AAX_ePlugInCategory_Dynamics" jucerVersion="5.0.2">
-  <MAINGROUP id="fYnHVH" name="juce_vst">
+  <MAINGROUP id="fYnHVH" name="reverb">
     <GROUP id="{0F3D635E-6E2B-9C40-AD88-E2CC0FCDF114}" name="Source">
       <FILE id="RnsrCI" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
