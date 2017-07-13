@@ -89,13 +89,31 @@ void Juce_vst2AudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
-	dryVal = 0.5f;
-	wetVal = 0.5f;
-	feedbackVal = 0.5f;
-	delayVal = 0.5f;
-	oscAmtVal = 0.5f;
-	oscFreqVal = 0.5f;
+	dryVal =        1.0f;
+	wetVal =        0.0f;
+	feedbackVal =   0.5f;
+	delayVal =      0.5f;
+	oscAmtVal =     0.5f;
+	oscFreqVal =    0.5f;
+	
+	filterFreqVal = 0.5f;
+	filterQVal =    1.0f;	
+	filterAmpVal =  0.5f;	
+	
+	filter2FreqVal = 0.5f;
+	filter2QVal =    1.0f;	
+	filter2AmpVal =  0.5f;	
+	
 	delay.prepareToPlay();
+	svfilter[0].setFc(1000.0f);
+	svfilter[1].setFc(1000.0f);
+	svfilter[0].setQ(1.0f);
+	svfilter[1].setQ(1.0f);
+	
+	svfilter2[0].setFc(1000.0f);
+	svfilter2[1].setFc(1000.0f);
+	svfilter2[0].setQ(1.0f);
+	svfilter2[1].setQ(1.0f);
 }
 
 void Juce_vst2AudioProcessor::releaseResources()
@@ -157,10 +175,21 @@ void Juce_vst2AudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffe
 
 			//how to synthesize noise
 			//data = random.nextFloat() * 0.25f - 0.125f;
+			//equalization
+			float filterFreqScaled = 5000.0f *   pow(filterFreqVal,2.0);
+			float filterQScaled =    2.0f *      filterQVal;
+			float filter2FreqScaled = 5000.0f *  pow(filter2FreqVal,2.0);
+			float filter2QScaled =    2.0f *     filter2QVal;
+			svfilter[channel].setFc(filterFreqScaled);
+			svfilter[channel].setQ(filterQScaled);
+			svfilter2[channel].setFc(filter2FreqScaled);
+			svfilter2[channel].setQ(filter2QScaled);
+			data += 2.0f * (0.5 - filterAmpVal) *  svfilter[channel].process(data,0);
+			data += 2.0f * (0.5 - filter2AmpVal) * svfilter2[channel].process(data,0);
 
 			//apply a delay
-			float oscAmtValScaled = 500.0f * oscAmtVal;				//amount in samples of modulation
-			float oscFreqValScaled = 20.0f * oscFreqVal;			//frequency (roughly) of modulation
+			float oscAmtValScaled =  500.0f   * oscAmtVal;				//amount in samples of modulation
+			float oscFreqValScaled = 20.0f    * oscFreqVal;				//frequency (roughly) of modulation
 			delay.updateIndex(delayVal, oscAmtValScaled, oscFreqValScaled, channel);
 			delay.write(channel, (data + feedbackVal * delay.read(channel)));
 			data = dryVal * data + wetVal * delay.read(channel);

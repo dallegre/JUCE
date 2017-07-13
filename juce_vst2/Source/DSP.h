@@ -62,3 +62,50 @@ private:
 	float yn, yq, yn_1, yq_1, fw, pi, fs, eps, amp2;
 
 };
+
+class stateVariable{
+
+public:
+
+	//maybe put stuff like this in preparetoplay instead.
+	stateVariable(){
+		f = 0.0f;
+		q = 0.0f;
+		hp = 0.0f;
+		bp = 0.0f;
+		lp = 0.0f;
+		bp_1 = 0.0f;
+		lp_1 = 0.0f;
+	}
+
+	~stateVariable(){};
+
+	void setFc(float fc){
+		f = 2.0f * sin(3.14159f * fc / 48000);
+	}	
+
+	void setQ(float Q){	//range of q should be 1.0 to 0.0
+		q = 4.0f * 1/(Q + 1.0);
+	}
+
+	float process(float input, int type){
+		//calculate filte outputs
+		hp = input - (q*bp_1) - lp;
+		bp = bp_1 + (f*hp);
+		lp = lp_1 + (f*bp_1);
+		//do integration for next time around
+		lp_1 = lp;
+		bp_1 = bp;
+		if(type == 0){
+			return lp;
+		}else if(type == 1){
+			return bp;
+		}else if(type == 2){
+			return hp;
+		}
+	}
+
+private:
+
+	float f, q, hp, bp, lp, bp_1, lp_1;
+};
