@@ -78,6 +78,7 @@ public:
 	//const int DELAYSIZE = 2.0 * int(juce::AudioProcessor::getSampleRate());
 	Delay delay;
 	stateVariable svfilter[2], svfilter2[2];
+	float prevSample[2];
 
 private:
     //==============================================================================

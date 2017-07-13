@@ -84,8 +84,16 @@ public:
 		f = 2.0f * sin(3.14159f * fc / 48000);
 	}	
 
+	//override for upsampling
+	void setFc(float fc, int upSamp) {
+		f = 2.0f * sin(3.14159f * fc / (48000 * upSamp));
+	}
+
 	void setQ(float Q){	//range of q should be 1.0 to 0.0
-		q = 4.0f * 1/(Q + 1.0);
+		q = 0.2f * (1/Q);
+		if (q > 10.0f) {
+			q = 10.0f;
+		}
 	}
 
 	float process(float input, int type){

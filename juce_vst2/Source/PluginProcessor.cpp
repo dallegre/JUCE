@@ -11,6 +11,8 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+#define UPSAMPLING 8
+
 
 //==============================================================================
 Juce_vst2AudioProcessor::Juce_vst2AudioProcessor()
@@ -105,8 +107,8 @@ void Juce_vst2AudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
 	filter2AmpVal =  0.5f;	
 	
 	delay.prepareToPlay();
-	svfilter[0].setFc(1000.0f);
-	svfilter[1].setFc(1000.0f);
+	svfilter[0].setFc(1000.0f, UPSAMPLING);
+	svfilter[1].setFc(1000.0f, UPSAMPLING);
 	svfilter[0].setQ(1.0f);
 	svfilter[1].setQ(1.0f);
 	
@@ -114,6 +116,9 @@ void Juce_vst2AudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
 	svfilter2[1].setFc(1000.0f);
 	svfilter2[0].setQ(1.0f);
 	svfilter2[1].setQ(1.0f);
+
+	prevSample[0] = 0.0f;
+	prevSample[1] = 0.0f;
 }
 
 void Juce_vst2AudioProcessor::releaseResources()
@@ -173,19 +178,33 @@ void Juce_vst2AudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffe
 			//this is how you get data from the inputs
 			float data = buffer.getSample(channel, sample);
 
+			float currentSample = data;
+
 			//how to synthesize noise
 			//data = random.nextFloat() * 0.25f - 0.125f;
+			
+			//upsampling.  Interpolate between the current sample and the previous sample
+			float upSamples[UPSAMPLING];
+			for (int i = 0; i < UPSAMPLING; i++) {
+				upSamples[i] = (prevSample[channel] * (((UPSAMPLING - 1) - i)/(UPSAMPLING - 1))) + (data * (i/(UPSAMPLING - 1)));
+			}
+			
 			//equalization
-			float filterFreqScaled = 5000.0f *   pow(filterFreqVal,2.0);
-			float filterQScaled =    2.0f *      filterQVal;
-			float filter2FreqScaled = 5000.0f *  pow(filter2FreqVal,2.0);
-			float filter2QScaled =    2.0f *     filter2QVal;
-			svfilter[channel].setFc(filterFreqScaled);
-			svfilter[channel].setQ(filterQScaled);
-			svfilter2[channel].setFc(filter2FreqScaled);
-			svfilter2[channel].setQ(filter2QScaled);
-			data += 2.0f * (0.5 - filterAmpVal) *  svfilter[channel].process(data,0);
-			data += 2.0f * (0.5 - filter2AmpVal) * svfilter2[channel].process(data,0);
+			float filterFreqScaled =  10000.0f *  pow(filterFreqVal, 3.0);
+			float filter2FreqScaled = 10000.0f *  pow(filter2FreqVal, 3.0);
+			svfilter[channel].setFc(filterFreqScaled, UPSAMPLING);
+			svfilter[channel].setQ(filterQVal);
+			svfilter2[channel].setFc(filter2FreqScaled, UPSAMPLING);
+			svfilter2[channel].setQ(filter2QVal);
+
+			//upsampling loop
+			for (int i = 0; i < UPSAMPLING; i++) {
+				upSamples[i] += 4.0f * (filterAmpVal - 0.5f) *  svfilter[channel].process(upSamples[i], 1);
+				upSamples[i] += 4.0f * (filter2AmpVal - 0.5f) * svfilter2[channel].process(upSamples[i], 1);
+			}
+
+			//do "decimation"
+			data = upSamples[UPSAMPLING - 1];
 
 			//apply a delay
 			float oscAmtValScaled =  500.0f   * oscAmtVal;				//amount in samples of modulation
@@ -196,6 +215,8 @@ void Juce_vst2AudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffe
 			//delay.clearUnused(channel);
 
 			buffer.setSample(channel, sample, data);
+
+			prevSample[channel] = currentSample;
 
 		}
 	}
