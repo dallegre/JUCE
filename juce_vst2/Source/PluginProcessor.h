@@ -64,10 +64,20 @@ public:
 	float delayVal;
 	float oscAmtVal;
 	float oscFreqVal;
+	
+	float filterFreqVal;
+	float filterQVal;
+	float filterAmpVal;
+	
+	float filter2FreqVal;
+	float filter2QVal;
+	float filter2AmpVal;
+	
 	Random random;
 	//just for fun
 	//const int DELAYSIZE = 2.0 * int(juce::AudioProcessor::getSampleRate());
 	Delay delay;
+	stateVariable svfilter[2], svfilter2[2];
 
 private:
     //==============================================================================
