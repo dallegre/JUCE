@@ -90,7 +90,7 @@ public:
 	}
 
 	void setQ(float Q){	//range of q should be 1.0 to 0.0
-		q = 0.2f * (1/Q);
+		q = 0.1f * (1/Q);
 		if (q > 10.0f) {
 			q = 10.0f;
 		}

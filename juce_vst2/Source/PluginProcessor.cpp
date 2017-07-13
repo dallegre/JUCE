@@ -11,7 +11,7 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
-#define UPSAMPLING 8
+#define UPSAMPLING 32
 
 
 //==============================================================================
@@ -199,8 +199,10 @@ void Juce_vst2AudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffe
 
 			//upsampling loop
 			for (int i = 0; i < UPSAMPLING; i++) {
-				upSamples[i] += 4.0f * (filterAmpVal - 0.5f) *  svfilter[channel].process(upSamples[i], 1);
-				upSamples[i] += 4.0f * (filter2AmpVal - 0.5f) * svfilter2[channel].process(upSamples[i], 1);
+				//upSamples[i] += 4.0f * (filterAmpVal - 0.5f) *  svfilter[channel].process(upSamples[i], 1);
+				//upSamples[i] += 4.0f * (filter2AmpVal - 0.5f) * svfilter2[channel].process(upSamples[i], 1);
+				upSamples[i] = svfilter[channel].process(upSamples[i], 2) * filterAmpVal * 4.0f;
+				upSamples[i] = svfilter2[channel].process(upSamples[i], 0) * filter2AmpVal * 4.0f;
 			}
 
 			//do "decimation"
