@@ -94,10 +94,10 @@ void Juce_vst2AudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
 	if (!prepareToPlayDone) {
 		
 		filterFreqVal = 0.0f;
-		filterQVal = 0.5f;
+		filterQVal = 0.2f;
 
 		filter2FreqVal = 1.0f;
-		filter2QVal = 0.5f;
+		filter2QVal = 0.2f;
 
 		dryVal = 1.0f;
 		wetVal = 0.0f;
@@ -106,9 +106,8 @@ void Juce_vst2AudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
 		oscAmtVal = 0.7f;
 		oscFreqVal = 0.3f;
 
-		delay.prepareToPlay();
-
 		for (int i = 0; i < 2; i++) {
+			delay[i].prepareToPlay();
 			svfilter[i].prepareToPlay();
 			svfilter[i].setFc(1000.0f, UPSAMPLING);
 			svfilter[i].setQ(1.0f);
@@ -198,7 +197,7 @@ void Juce_vst2AudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffe
 			}
 			
 			//equalization
-			filterFreqScaled =  20000.0f *  pow(filterFreqVal, 3.0);
+			filterFreqScaled = 20000.0f *  pow(filterFreqVal, 3.0);
 			filterFreqScaled = fcSmoothing.process(filterFreqScaled);
 			filter2FreqScaled = 20000.0f *  pow(filter2FreqVal, 3.0);
 			filter2FreqScaled = fc2Smoothing.process(filter2FreqScaled);
@@ -219,10 +218,9 @@ void Juce_vst2AudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffe
 			//apply a delay
 			float oscAmtValScaled =  50.0f   * oscAmtVal;										//amount in samples of modulation
 			float oscFreqValScaled = 2.0f    * freqSmoothing.process(oscFreqVal);				//frequency (roughly) of modulation
-			delay.updateIndex(delayVal, oscAmtValScaled, oscFreqValScaled, channel);
-			delay.write(channel, (data + feedbackVal * delay.read(channel)));
-			data = dryVal * data + wetVal * delay.read(channel);
-			//delay.clearUnused(channel);
+			delay[channel].updateIndex(delayVal, oscAmtValScaled, oscFreqValScaled, channel);
+			delay[channel].write((data + feedbackVal * delay[channel].read()));
+			data = dryVal * data + wetVal * delay[channel].read();
 
 			buffer.setSample(channel, sample, data);
 

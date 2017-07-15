@@ -77,7 +77,7 @@ public:
 	
 	Random random;
 
-	Delay delay;
+	Delay delay[2];
 	stateVariable svfilter[2], svfilter2[2];
 	float prevSample[2];
 	OnePoleLp freqSmoothing, fcSmoothing, fc2Smoothing;
