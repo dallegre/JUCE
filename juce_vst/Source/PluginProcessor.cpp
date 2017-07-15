@@ -89,42 +89,49 @@ void Juce_vstAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
-	dryVal = 1.0f;
-	wetVal = 0.5f;
-	timeVal = 0.9f;
-	dampVal = 0.5f;
+	if (!donePrepareToPlay) {
+		
+		dryVal = 1.0f;
+		wetVal = 0.5f;
+		timeVal = 0.9f;
+		dampVal = 0.5f;
 
-	feedbackVal = 0.5f;
-	delayVal = 0.6f;
-	oscAmtVal = 0.4f;
-	oscFreqVal = 0.1f;
+		feedbackVal = 0.5f;
+		delayVal = 0.6f;
+		oscAmtVal = 0.4f;
+		oscFreqVal = 0.1f;
+
+		feedback2Val = 0.7f;
+		delay2Val = 0.3f;
+		oscAmt2Val = 0.5f;
+		oscFreq2Val = 0.3f;
+
+		oscAmtValScaled = 50.0f  * oscAmtVal;				//amount in samples of modulation
+		oscFreqValScaled = 5.0f  * oscFreqVal;				//frequency (roughly) of modulation
+		oscAmtVal2Scaled = 50.0f * oscAmt2Val;				//amount in samples of modulation
+		oscFreqVal2Scaled = 5.0f * oscFreq2Val;				//frequency (roughly) of modulation
+		timeValScaled = 1.0f     * pow(timeVal, 0.5f);
+		dampValScaled = 16000.0f * pow(dampVal, 2.0f) / 48000;
+
+		feedback[0] = 0.0f;
+		feedback[1] = 0.0f;
+
+		allpass[0].prepareToPlay();
+		allpass2[0].prepareToPlay();
+		allpass3[0].prepareToPlay();
+		allpass4[0].prepareToPlay();
+		allpass[1].prepareToPlay();
+		allpass2[1].prepareToPlay();
+		allpass3[1].prepareToPlay();
+		allpass4[1].prepareToPlay();
+
+		damping[0].setFc(dampValScaled);
+		damping[1].setFc(dampValScaled);
+
+		donePrepareToPlay = 1;
 	
-	feedback2Val = 0.7f;
-	delay2Val = 0.3f;
-	oscAmt2Val = 0.5f;
-	oscFreq2Val = 0.3f;
+	}
 
-	oscAmtValScaled = 50.0f  * oscAmtVal;				//amount in samples of modulation
-	oscFreqValScaled = 5.0f  * oscFreqVal;				//frequency (roughly) of modulation
-	oscAmtVal2Scaled = 50.0f * oscAmt2Val;				//amount in samples of modulation
-	oscFreqVal2Scaled = 5.0f * oscFreq2Val;				//frequency (roughly) of modulation
-	timeValScaled = 1.0f     * pow(timeVal, 0.5f);
-	dampValScaled = 16000.0f * pow(dampVal, 2.0f) / 48000;
-
-	feedback[0] = 0.0f;
-	feedback[1] = 0.0f;
-	
-	allpass[0].prepareToPlay();
-	allpass2[0].prepareToPlay();
-	allpass3[0].prepareToPlay();
-	allpass4[0].prepareToPlay();
-	allpass[1].prepareToPlay();
-	allpass2[1].prepareToPlay();
-	allpass3[1].prepareToPlay();
-	allpass4[1].prepareToPlay();
-
-	damping[0].setFc(dampValScaled);
-	damping[1].setFc(dampValScaled);
 }
 
 void Juce_vstAudioProcessor::releaseResources()

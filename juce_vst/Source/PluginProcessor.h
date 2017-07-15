@@ -80,6 +80,8 @@ public:
 	float timeValScaled;
 	float dampValScaled;
 
+	int donePrepareToPlay = 0;
+
 	Random random;
 	//just for fun
 	//const int DELAYSIZE = 2.0 * int(juce::AudioProcessor::getSampleRate());

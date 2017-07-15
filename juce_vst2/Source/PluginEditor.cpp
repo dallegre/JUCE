@@ -18,7 +18,7 @@ Juce_vst2AudioProcessorEditor::Juce_vst2AudioProcessorEditor (Juce_vst2AudioProc
 {
 	// Make sure that before the constructor has finished, you've set the
 	// editor's size to whatever you need it to be.
-	setSize(420, 300);
+	setSize(400, 300);
 	setResizable(false, true);
 
 	//the constructor gets called every time you click on the plugin so initialize everything at prepare to play
