@@ -93,20 +93,18 @@ void Juce_vst2AudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
     // initialisation that you need..
 	if (!prepareToPlayDone) {
 		
+		filterFreqVal = 0.0f;
+		filterQVal = 0.5f;
+
+		filter2FreqVal = 1.0f;
+		filter2QVal = 0.5f;
+
 		dryVal = 1.0f;
 		wetVal = 0.0f;
 		feedbackVal = 0.5f;
 		delayVal = 0.5f;
-		oscAmtVal = 0.5f;
+		oscAmtVal = 0.0f;
 		oscFreqVal = 0.5f;
-
-		filterFreqVal = 0.0f;
-		filterQVal = 0.5f;
-		filterAmpVal = 1.0f;
-
-		filter2FreqVal = 1.0f;
-		filter2QVal = 0.5f;
-		filter2AmpVal = 1.0f;
 
 		delay.prepareToPlay();
 
@@ -122,6 +120,10 @@ void Juce_vst2AudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
 		prevSample[1] = 0.0f;
 
 		prepareToPlayDone = 1;
+
+		freqSmoothing.setFc(1.0f / SAMPLINGFREQ);
+		fcSmoothing.setFc(1.0f / SAMPLINGFREQ);
+		fc2Smoothing.setFc(1.0f / SAMPLINGFREQ);
 
 	}
 
@@ -197,7 +199,9 @@ void Juce_vst2AudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffe
 			
 			//equalization
 			float filterFreqScaled =  20000.0f *  pow(filterFreqVal, 3.0);
+			filterFreqScaled = fcSmoothing.process(filterFreqScaled);
 			float filter2FreqScaled = 20000.0f *  pow(filter2FreqVal, 3.0);
+			filter2FreqScaled = fc2Smoothing.process(filter2FreqScaled);
 			svfilter[channel].setFc(filterFreqScaled, UPSAMPLING);
 			svfilter[channel].setQ(filterQVal);
 			svfilter2[channel].setFc(filter2FreqScaled, UPSAMPLING);
@@ -205,8 +209,6 @@ void Juce_vst2AudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffe
 
 			//upsampling loop
 			for (int i = 0; i < UPSAMPLING - 1; i++) {
-				//upSamples[i] += 4.0f * (filterAmpVal - 0.5f) *  svfilter[channel].process(upSamples[i], 1);
-				//upSamples[i] += 4.0f * (filter2AmpVal - 0.5f) * svfilter2[channel].process(upSamples[i], 1);
 				upSamples[i] = svfilter[channel].process(upSamples[i], 2);
 				upSamples[i] = svfilter2[channel].process(upSamples[i], 0);
 			}
@@ -215,8 +217,8 @@ void Juce_vst2AudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffe
 			data = upSamples[UPSAMPLING - 2]; 
 
 			//apply a delay
-			float oscAmtValScaled =  50.0f   * oscAmtVal;				//amount in samples of modulation
-			float oscFreqValScaled = 2.0f    * oscFreqVal;				//frequency (roughly) of modulation
+			float oscAmtValScaled =  50.0f   * oscAmtVal;										//amount in samples of modulation
+			float oscFreqValScaled = 2.0f    * freqSmoothing.process(oscFreqVal);				//frequency (roughly) of modulation
 			delay.updateIndex(delayVal, oscAmtValScaled, oscFreqValScaled, channel);
 			delay.write(channel, (data + feedbackVal * delay.read(channel)));
 			data = dryVal * data + wetVal * delay.read(channel);

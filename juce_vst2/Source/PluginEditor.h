@@ -32,20 +32,18 @@ private:
     // access the processor object that created it.
     Juce_vst2AudioProcessor& processor;
 
+	Slider filterFreqSlider;
+	Slider filterQSlider;
+
+	Slider filter2FreqSlider;
+	Slider filter2QSlider;
+
 	Slider drySlider;
 	Slider wetSlider;
 	Slider feedbackSlider;
 	Slider delaySlider;
 	Slider oscFreqSlider;
 	Slider oscAmtSlider;
-	
-	Slider filterFreqSlider;
-	Slider filterQSlider;
-	Slider filterAmpSlider;
-	
-	Slider filter2FreqSlider;
-	Slider filter2QSlider;
-	Slider filter2AmpSlider;
 	
 	void sliderValueChanged(Slider* slider) override;
 
