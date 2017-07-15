@@ -11,7 +11,7 @@ public:
 	~OnePoleLp() {};
 
 	void setFc(float Fc) {
-		b1 = exp(-2.0f * 3.14159f * Fc);
+		b1 = exp(-2.0f * 3.14159f * Fc / SAMPLINGFREQ);
 		a0 = 1.0f - b1;
 	}
 
@@ -33,10 +33,10 @@ public:
 	
 	gsOsc() {
 		yn = 0;					//initial condition sine(0) = 0
-		yq = 0;					//initial condition cos(0) = 1
+		yq = 1;					//initial condition cos(0) = 1
 		yn_1 = 1, yq_1 = 0;     //hmm...
 		pi = 3.14159;
-		fs = SAMPLINGFREQ * 0.1f;
+		fs = SAMPLINGFREQ;
 	}
 
 	~gsOsc() {};
@@ -53,8 +53,8 @@ public:
 		yn_1 = yn;
 		yq_1 = yq;
 		//check to see if it's going crazy
-		if ((yq > 2.0f) || (yq < -2.0f)) {
-			yn = 0; yq = 0; yn_1 = 1; yq_1 = 0;
+		if ((yq > 3.0f) || (yq < -3.0f)) {
+			yn = 0; yq = 1; yn_1 = 1; yq_1 = 0;
 			return 0;
 		}
 		else {

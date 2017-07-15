@@ -116,17 +116,13 @@ void Juce_vstAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
 		feedback[0] = 0.0f;
 		feedback[1] = 0.0f;
 
-		allpass[0].prepareToPlay();
-		allpass2[0].prepareToPlay();
-		allpass3[0].prepareToPlay();
-		allpass4[0].prepareToPlay();
-		allpass[1].prepareToPlay();
-		allpass2[1].prepareToPlay();
-		allpass3[1].prepareToPlay();
-		allpass4[1].prepareToPlay();
-
-		damping[0].setFc(dampValScaled);
-		damping[1].setFc(dampValScaled);
+		for (int i = 0; i < 2; i++) {
+			allpass[i].prepareToPlay();
+			allpass2[i].prepareToPlay();
+			allpass3[i].prepareToPlay();
+			allpass4[i].prepareToPlay();
+			damping[i].setFc(dampValScaled);
+		}
 
 		donePrepareToPlay = 1;
 	
