@@ -1,12 +1,14 @@
 #include <math.h>
 
+#define SAMPLINGFREQ 44100
+
 class OnePoleLp {
 
 public:
 
 	OnePoleLp() { a0 = 1.0f; b1 = 0.0f; z1 = 0.0f; };
 	OnePoleLp(float Fc) { z1 = 0.0; setFc(Fc); };
-	~OnePoleLp(){};
+	~OnePoleLp() {};
 
 	void setFc(float Fc) {
 		b1 = exp(-2.0f * 3.14159f * Fc);
@@ -34,7 +36,7 @@ public:
 		yq = 0;					//initial condition cos(0) = 1
 		yn_1 = 1, yq_1 = 0;     //hmm...
 		pi = 3.14159;
-		fs = 48000 * 0.1f;
+		fs = SAMPLINGFREQ * 0.1f;
 	}
 
 	~gsOsc() {};
@@ -50,10 +52,17 @@ public:
 		yn = eps*yq + yn_1;
 		yn_1 = yn;
 		yq_1 = yq;
-		if (quad)
-			return yn*amp2;
-		else
-			return yq*amp2;
+		//check to see if it's going crazy
+		if ((yq > 2.0f) || (yq < -2.0f)) {
+			yn = 0; yq = 0; yn_1 = 1; yq_1 = 0;
+			return 0;
+		}
+		else {
+			if (quad)
+				return yn*amp2;
+			else
+				return yq*amp2;
+		}
 	}
 
 private:
@@ -69,6 +78,11 @@ public:
 
 	//maybe put stuff like this in preparetoplay instead.
 	stateVariable(){
+	}
+
+	~stateVariable(){};
+
+	void prepareToPlay() {
 		f = 0.0f;
 		q = 0.0f;
 		hp = 0.0f;
@@ -78,22 +92,20 @@ public:
 		lp_1 = 0.0f;
 	}
 
-	~stateVariable(){};
-
 	void setFc(float fc){
-		f = 2.0f * sin(3.14159f * fc / 48000);
+		f = 2.0f * sin(3.14159f * fc / SAMPLINGFREQ);
 	}	
 
 	//override for upsampling
 	void setFc(float fc, int upSamp) {
-		f = 2.0f * sin(3.14159f * fc / (48000 * upSamp));
+		f = 2.0f * sin(3.14159f * fc / (SAMPLINGFREQ * upSamp));
 	}
 
 	void setQ(float Q){	//range of q should be 1.0 to 0.0
-		q = 0.1f * (1/Q);
-		if (q > 10.0f) {
-			q = 10.0f;
+		if (Q < 0.1) {
+			Q = 0.1;
 		}
+		q = 0.05f * (1/(Q/2.0));
 	}
 
 	float process(float input, int type){

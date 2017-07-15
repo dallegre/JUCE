@@ -50,8 +50,8 @@ public:
 		}
 
 		//filter for smoothing the delay time control
-		controlFilter.setFc(1.0f/(48000));
-		modOsc.setF(48000 * 0.1f, 100.0f);
+		controlFilter.setFc(1.0f/(SAMPLINGFREQ));
+		modOsc.setF(SAMPLINGFREQ * 0.1f, 100.0f);
 	}
 
 	//update index.  operates on delayReadIndex and delayWJriteIndex, which are arrays of 2 for left/right indeces.
@@ -68,7 +68,7 @@ public:
 
 		delaySize = float(DELAYSIZE) - float(DELAYSIZE) * delayVal;
 		delaySize = controlFilter.process(delaySize);
-		modOsc.setF(48000 * modFreq, modAmt);
+		modOsc.setF(SAMPLINGFREQ * modFreq, modAmt);
 		delaySize += modOsc.process(0);
 		delaySizeFrac = delaySize - int(delaySize);
 

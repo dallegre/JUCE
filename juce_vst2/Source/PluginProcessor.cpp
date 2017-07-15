@@ -91,34 +91,40 @@ void Juce_vst2AudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
-	dryVal =        1.0f;
-	wetVal =        0.0f;
-	feedbackVal =   0.5f;
-	delayVal =      0.5f;
-	oscAmtVal =     0.5f;
-	oscFreqVal =    0.5f;
-	
-	filterFreqVal = 0.5f;
-	filterQVal =    1.0f;	
-	filterAmpVal =  0.5f;	
-	
-	filter2FreqVal = 0.5f;
-	filter2QVal =    1.0f;	
-	filter2AmpVal =  0.5f;	
-	
-	delay.prepareToPlay();
-	svfilter[0].setFc(1000.0f, UPSAMPLING);
-	svfilter[1].setFc(1000.0f, UPSAMPLING);
-	svfilter[0].setQ(1.0f);
-	svfilter[1].setQ(1.0f);
-	
-	svfilter2[0].setFc(1000.0f);
-	svfilter2[1].setFc(1000.0f);
-	svfilter2[0].setQ(1.0f);
-	svfilter2[1].setQ(1.0f);
+	if (!prepareToPlayDone) {
+		
+		dryVal = 1.0f;
+		wetVal = 0.0f;
+		feedbackVal = 0.5f;
+		delayVal = 0.5f;
+		oscAmtVal = 0.5f;
+		oscFreqVal = 0.5f;
 
-	prevSample[0] = 0.0f;
-	prevSample[1] = 0.0f;
+		filterFreqVal = 0.0f;
+		filterQVal = 0.5f;
+		filterAmpVal = 1.0f;
+
+		filter2FreqVal = 1.0f;
+		filter2QVal = 0.5f;
+		filter2AmpVal = 1.0f;
+
+		delay.prepareToPlay();
+
+		for (int i = 0; i < 2; i++) {
+			svfilter[i].prepareToPlay();
+			svfilter[i].setFc(1000.0f, UPSAMPLING);
+			svfilter[i].setQ(1.0f);
+			svfilter2[i].setFc(1000.0f, UPSAMPLING);
+			svfilter2[i].setQ(1.0f);
+		}
+
+		prevSample[0] = 0.0f;
+		prevSample[1] = 0.0f;
+
+		prepareToPlayDone = 1;
+
+	}
+
 }
 
 void Juce_vst2AudioProcessor::releaseResources()
@@ -186,31 +192,31 @@ void Juce_vst2AudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffe
 			//upsampling.  Interpolate between the current sample and the previous sample
 			float upSamples[UPSAMPLING];
 			for (int i = 0; i < UPSAMPLING; i++) {
-				upSamples[i] = (prevSample[channel] * (((UPSAMPLING - 1) - i)/(UPSAMPLING - 1))) + (data * (i/(UPSAMPLING - 1)));
+				upSamples[i] = (prevSample[channel] * float(((float(UPSAMPLING) - 1) - i)/(float(UPSAMPLING) - 1))) + (data * float(i/(float(UPSAMPLING) - 1)));
 			}
 			
 			//equalization
-			float filterFreqScaled =  10000.0f *  pow(filterFreqVal, 3.0);
-			float filter2FreqScaled = 10000.0f *  pow(filter2FreqVal, 3.0);
+			float filterFreqScaled =  20000.0f *  pow(filterFreqVal, 3.0);
+			float filter2FreqScaled = 20000.0f *  pow(filter2FreqVal, 3.0);
 			svfilter[channel].setFc(filterFreqScaled, UPSAMPLING);
 			svfilter[channel].setQ(filterQVal);
 			svfilter2[channel].setFc(filter2FreqScaled, UPSAMPLING);
 			svfilter2[channel].setQ(filter2QVal);
 
 			//upsampling loop
-			for (int i = 0; i < UPSAMPLING; i++) {
+			for (int i = 0; i < UPSAMPLING - 1; i++) {
 				//upSamples[i] += 4.0f * (filterAmpVal - 0.5f) *  svfilter[channel].process(upSamples[i], 1);
 				//upSamples[i] += 4.0f * (filter2AmpVal - 0.5f) * svfilter2[channel].process(upSamples[i], 1);
-				upSamples[i] = svfilter[channel].process(upSamples[i], 2) * filterAmpVal * 4.0f;
-				upSamples[i] = svfilter2[channel].process(upSamples[i], 0) * filter2AmpVal * 4.0f;
+				upSamples[i] = svfilter[channel].process(upSamples[i], 2);
+				upSamples[i] = svfilter2[channel].process(upSamples[i], 0);
 			}
-
+			 
 			//do "decimation"
-			data = upSamples[UPSAMPLING - 1];
+			data = upSamples[UPSAMPLING - 2]; 
 
 			//apply a delay
-			float oscAmtValScaled =  500.0f   * oscAmtVal;				//amount in samples of modulation
-			float oscFreqValScaled = 20.0f    * oscFreqVal;				//frequency (roughly) of modulation
+			float oscAmtValScaled =  50.0f   * oscAmtVal;				//amount in samples of modulation
+			float oscFreqValScaled = 2.0f    * oscFreqVal;				//frequency (roughly) of modulation
 			delay.updateIndex(delayVal, oscAmtValScaled, oscFreqValScaled, channel);
 			delay.write(channel, (data + feedbackVal * delay.read(channel)));
 			data = dryVal * data + wetVal * delay.read(channel);

@@ -72,6 +72,8 @@ public:
 	float filter2FreqVal;
 	float filter2QVal;
 	float filter2AmpVal;
+
+	int prepareToPlayDone = 0;
 	
 	Random random;
 	//just for fun
