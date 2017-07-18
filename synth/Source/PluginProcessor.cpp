@@ -111,16 +111,19 @@ void SynthAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     freqSmoothing[1].prepareForPlay();
     freqSmoothing2[0].prepareForPlay();
     freqSmoothing2[1].prepareForPlay();
-    
-    freqVal = 0.5;
-    qVal = 0.0;
-    envVal = 1.0f;
+
+    oscVal = 0.2f;
+    detVal = 0.5f;
+    freqVal = 0.1f;
+    qVal = 0.5f;
+    envVal = 0.6f;
     speedVal = 0.5f;
     
     freqValScaled = 20000.0f * pow(freqVal, 3.0f);
     envValScaled =  1000.0f *  pow(envVal, 3.0f);
     speedValScaled = (1.0f -  speedVal);
     oscValScaled =   (oscVal - 0.5f) * 70.0f;
+    detValScaled =   (detVal - 0.5f) * 7.0f;
     
 }
 
@@ -198,7 +201,7 @@ void SynthAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& m
     for (int channel = 0; channel < totalNumOutputChannels; ++channel){
         for(int sample = 0; sample < buffer.getNumSamples(); ++sample){
             
-            filter[channel].setFc((freqValScaled + (envValScaled * env.process()))/UPSAMPLING);
+            filter[channel].setFc((freqValScaled + (envValScaled * pow(env.process(),3.0f)))/UPSAMPLING);
             env.setSpeed(speedValScaled);
             filter[channel].setQ(qVal);
             float freqency = freqSmoothing[channel].process(m.getMidiNoteInHertz(noteVal + oscValScaled)/UPSAMPLING);

@@ -50,7 +50,7 @@ public:
     }
     
     void setQ(float Q){
-        q = Q * 3.0f;
+        q = Q * 4.0f;
     }
 
     void prepareToPlay(void){
