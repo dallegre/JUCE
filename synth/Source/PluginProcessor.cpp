@@ -10,6 +10,7 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include <math.h>
 
 #define UPSAMPLING 32
 
@@ -204,8 +205,8 @@ void SynthAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& m
             filter[channel].setFc((freqValScaled + (envValScaled * pow(env.process(),3.0f)))/UPSAMPLING);
             env.setSpeed(speedValScaled);
             filter[channel].setQ(qVal);
-            float freqency = freqSmoothing[channel].process(m.getMidiNoteInHertz(noteVal + oscValScaled)/UPSAMPLING);
-            float freqency2 = freqSmoothing2[channel].process(m.getMidiNoteInHertz(noteVal + oscValScaled + detValScaled)/UPSAMPLING);
+            float freqency =  freqSmoothing[channel].process(exp((noteVal + oscValScaled)/17.31f)/UPSAMPLING);
+            float freqency2 = freqSmoothing2[channel].process(exp((noteVal + oscValScaled + detValScaled)/17.31f)/UPSAMPLING);
             osc[channel].setF(freqency);
             osc2[channel].setF(freqency2);
             float monoNoteOn2 = ampSmoothing[channel].process(monoNoteOn);
