@@ -84,7 +84,7 @@ public:
     ~OnePoleLP(){};
     
     void prepareForPlay(void){
-        setFc2(30.0f);
+        setFc2(300.0f);
         z1 = 0.0f;
     }
     
