@@ -38,7 +38,7 @@ public:
     void processBlock (AudioSampleBuffer&, MidiBuffer&) override;
 
     //==============================================================================
-    AudioProcessorEditor* createEditor() override;
+    AudioProcessorEditor* createEditor() override; 
     bool hasEditor() const override;
 
     //==============================================================================
@@ -73,18 +73,20 @@ public:
 	float oscAmtVal;
 	float oscFreqVal;
 
+	float filterFreqScaled, filter2FreqScaled, oscAmtValScaled, oscFreqValScaled;
+
 	int prepareToPlayDone = 0;
 
-	float filterFreqScaled, filter2FreqScaled;
-	
+	stateVariable svfilter[2], svfilter2[2];
+
+private:
+
 	Random random;
 
 	Delay delay[2];
-	stateVariable svfilter[2], svfilter2[2];
-	float prevSample[2], data, data2, oscAmtValScaled,oscFreqValScaled, upSamples[UPSAMPLING];
+	float prevSample[2], data, data2, upSamples[UPSAMPLING];
 	OnePoleLp freqSmoothing, fcSmoothing, fc2Smoothing;
 
-private:
     //==============================================================================
 	
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Juce_vst2AudioProcessor)

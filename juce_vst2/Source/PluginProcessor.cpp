@@ -97,8 +97,8 @@ void Juce_vst2AudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
 		filter2FreqVal = 1.0f;
 		filter2QVal =    0.2f;
         
-        filterFreqScaled =  10000.0f *  pow(filterFreqVal,  3.0);
-        filter2FreqScaled = 20000.0f *  pow(filter2FreqVal, 3.0);
+        filterFreqScaled =  0.0f;
+        filter2FreqScaled = 20000.0f;
 
 		dryVal =      1.0f;
 		wetVal =      0.0f;
@@ -115,9 +115,9 @@ void Juce_vst2AudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
 			svfilter[i].prepareToPlay();
 			svfilter2[i].prepareToPlay();
 			svfilter[i].setFc(filterFreqScaled, UPSAMPLING);
-			svfilter[i].setQ(1.0f);
+			svfilter[i].setQ(0.0f);
 			svfilter2[i].setFc(filter2FreqScaled, UPSAMPLING);
-			svfilter2[i].setQ(1.0f);
+			svfilter2[i].setQ(0.0f);
             prevSample[i] = 0.0f;
 		}
         
@@ -125,7 +125,7 @@ void Juce_vst2AudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
         fc2Smoothing.prepareToPlay();
 		fcSmoothing.setFc(1.0f);
 		fc2Smoothing.setFc(1.0f);
-        
+         
         data =  0.0f;
         data2 = 0.0f;
         
@@ -192,6 +192,8 @@ void Juce_vst2AudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffe
 
 			//how to synthesize noise
 			//data = random.nextFloat() * 0.25f - 0.125f;
+
+			data = data / 100.0f;
             
 			//upsampling loop
 			for (int i = 0; i < UPSAMPLING - 1; i++) {
@@ -201,13 +203,15 @@ void Juce_vst2AudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffe
             }
             //upsample by half the amount for the highpass (it's high cutoff operation is not nearly as critical as nothing will really be getting through as opposed to the entire signal
             for(int i = 0; i < UPSAMPLING; i += 2){
-                data2 = svfilter2[channel].processLP(data2);
+                data2 = svfilter2[channel].processLP(upSamples[i]);
 			}
 
 			//apply a delay
 			delay[channel].updateIndex(delayVal, oscAmtValScaled, oscFreqValScaled, channel);
 			delay[channel].write((data2 + feedbackVal * delay[channel].read()));
 			data2 = dryVal * data2 + wetVal * delay[channel].read();
+
+			data2 = data2 * 100.0f;
 
 			buffer.setSample(channel, sample, data2);
 

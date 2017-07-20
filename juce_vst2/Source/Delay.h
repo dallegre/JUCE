@@ -12,22 +12,6 @@ public:
 
 	~Delay(void) {}
 
-	//if you shortened the delay length, you'll want to clear the samples that you just decided to take out
-	void clearUnused(int channel) {
-		
-		if (delaySizeOld > delaySize) {
-			for (int i = delaySize; i < delaySizeOld; i++) {
-				//make sure you don't go out of bounds.
-				if (i < DELAYSIZE) {
-					delay[i] = 0.0f;
-				}
-			}
-		}
-
-		delaySizeOld = delaySize;
-
-	}
-
 	//Put into preparetoplay..
 	void prepareToPlay(void) {
 		
@@ -47,7 +31,7 @@ public:
 
 		//filter for smoothing the delay time control
 		controlFilter.setFc(1.0f);
-		modOsc.setF(0.1f, 100.0f);
+		modOsc.setF(0.1f, 0.0f);
 	}
 
 	//update index.  operates on delayReadIndex and delayWJriteIndex, which are arrays of 2 for left/right indeces.
@@ -77,7 +61,7 @@ public:
 	}
 
 	float read(void) {
-		if (delayReadIndex < DELAYSIZE) {
+		if ((delayReadIndex < DELAYSIZE) && (delayReadIndex > 0)) {
 			if(delayReadIndex+1 < DELAYSIZE){
 				return linterp(delay[delayReadIndex], delay[delayReadIndex+1], delaySizeFrac);
 			}else{
@@ -89,7 +73,7 @@ public:
 	}
 
 	void write(float input) {
-		if (delayWriteIndex < DELAYSIZE) {
+		if ((delayWriteIndex < DELAYSIZE) && (delayWriteIndex > 0)) {
 			delay[delayWriteIndex] = input;
 		}
 	}

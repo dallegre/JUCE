@@ -9,7 +9,8 @@
               pluginCode="Miju" pluginChannelConfigs="" pluginIsSynth="0" pluginWantsMidiIn="0"
               pluginProducesMidiOut="0" pluginIsMidiEffectPlugin="0" pluginEditorRequiresKeys="0"
               pluginAUExportPrefix="filterdelayAU" pluginRTASCategory="" aaxIdentifier="com.dan.filterdelay"
-              pluginAAXCategory="AAX_ePlugInCategory_Dynamics" jucerVersion="5.0.2">
+              pluginAAXCategory="AAX_ePlugInCategory_Dynamics" jucerVersion="5.0.2"
+              companyName="dan">
   <MAINGROUP id="KqXb3H" name="filterdelay">
     <GROUP id="{FD6C660B-3679-5B28-85DF-FDB42DDAC18C}" name="Source">
       <FILE id="F9TF5I" name="PluginProcessor.cpp" compile="1" resource="0"
