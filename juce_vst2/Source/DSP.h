@@ -6,9 +6,12 @@ class OnePoleLp {
 
 public:
 
-	OnePoleLp() { a0 = 1.0f; b1 = 0.0f; z1 = 0.0f; };
-	OnePoleLp(float Fc) { z1 = 0.0; setFc(Fc); };
+	OnePoleLp(){};
 	~OnePoleLp() {};
+    
+    void prepareToPlay(void){
+        a0 = 1.0f; b1 = 0.0f; z1 = 0.0f;
+    }
 
 	void setFc(float Fc) {
 		b1 = exp(-2.0f * 3.14159f * Fc / SAMPLINGFREQ);
@@ -108,7 +111,7 @@ public:
 		q = 0.05f * (1/(Q/2.0));
 	}
 
-	float process(float input, int type){
+	float processLP(float input){
 		//calculate filte outputs
 		hp = input - (q*bp_1) - lp;
 		bp = bp_1 + (f*hp);
@@ -116,14 +119,19 @@ public:
 		//do integration for next time around
 		lp_1 = lp;
 		bp_1 = bp;
-		if(type == 0){
-			return lp;
-		}else if(type == 1){
-			return bp;
-		}else if(type == 2){
-			return hp;
-		}
+        return lp;
 	}
+    
+    float processHP(float input){
+        //calculate filte outputs
+        hp = input - (q*bp_1) - lp;
+        bp = bp_1 + (f*hp);
+        lp = lp_1 + (f*bp_1);
+        //do integration for next time around
+        lp_1 = lp;
+        bp_1 = bp;
+        return hp;
+    }
 
 private:
 

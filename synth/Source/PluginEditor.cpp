@@ -90,7 +90,7 @@ void SynthAudioProcessorEditor::sliderValueChanged(Slider* slider){
     
     processor.freqValScaled = 20000.0f * pow(processor.freqVal, 3.0f);
     processor.envValScaled =  10000.0f *  pow(processor.envVal, 3.0f);
-    processor.speedValScaled = (1.0f -  processor.speedVal);
+    processor.speedValScaled = pow((1.0f -  processor.speedVal),2.0f);
     processor.oscValScaled =   (processor.oscVal - 0.5f) * 60.0f;
     processor.detValScaled =   (processor.detVal - 0.5f) * 12.0f;
 

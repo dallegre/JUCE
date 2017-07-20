@@ -11,8 +11,6 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
-#define UPSAMPLING 32
-
 
 //==============================================================================
 Juce_vst2AudioProcessor::Juce_vst2AudioProcessor()
@@ -93,36 +91,45 @@ void Juce_vst2AudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
     // initialisation that you need..
 	if (!prepareToPlayDone) {
 		
-		filterFreqVal = 0.0f;
-		filterQVal = 0.2f;
+		filterFreqVal =  0.0f;
+		filterQVal =     0.2f;
 
 		filter2FreqVal = 1.0f;
-		filter2QVal = 0.2f;
+		filter2QVal =    0.2f;
+        
+        filterFreqScaled =  10000.0f *  pow(filterFreqVal,  3.0);
+        filter2FreqScaled = 20000.0f *  pow(filter2FreqVal, 3.0);
 
-		dryVal = 1.0f;
-		wetVal = 0.0f;
+		dryVal =      1.0f;
+		wetVal =      0.0f;
 		feedbackVal = 0.5f;
-		delayVal = 0.5f;
-		oscAmtVal = 0.7f;
-		oscFreqVal = 0.3f;
+		delayVal =    0.5f;
+		oscAmtVal =   0.7f;
+		oscFreqVal =  0.3f;
+        
+        oscAmtValScaled =  50.0f   * oscAmtVal;
+        oscFreqValScaled = 2.0f *    oscFreqVal;
 
 		for (int i = 0; i < 2; i++) {
 			delay[i].prepareToPlay();
 			svfilter[i].prepareToPlay();
-			svfilter[i].setFc(1000.0f, UPSAMPLING);
+			svfilter2[i].prepareToPlay();
+			svfilter[i].setFc(filterFreqScaled, UPSAMPLING);
 			svfilter[i].setQ(1.0f);
-			svfilter2[i].setFc(1000.0f, UPSAMPLING);
+			svfilter2[i].setFc(filter2FreqScaled, UPSAMPLING);
 			svfilter2[i].setQ(1.0f);
+            prevSample[i] = 0.0f;
 		}
-
-		prevSample[0] = 0.0f;
-		prevSample[1] = 0.0f;
-
-		prepareToPlayDone = 1;
-
-		freqSmoothing.setFc(1.0f);
+        
+        fcSmoothing.prepareToPlay();
+        fc2Smoothing.prepareToPlay();
 		fcSmoothing.setFc(1.0f);
 		fc2Smoothing.setFc(1.0f);
+        
+        data =  0.0f;
+        data2 = 0.0f;
+        
+		prepareToPlayDone = 1;
 
 	}
 
@@ -170,9 +177,7 @@ void Juce_vst2AudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffe
 	// when they first compile a plugin, but obviously you don't need to keep
 	// this code if your algorithm always overwrites all the output channels.
 	for (int i = totalNumInputChannels; i < totalNumOutputChannels; ++i) {
-
 		buffer.clear(i, 0, buffer.getNumSamples());
-
 	}
 
 	// This is the place where you'd normally do the guts of your plugin's
@@ -183,48 +188,30 @@ void Juce_vst2AudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffe
 		for (int sample = 0; sample < buffer.getNumSamples(); ++sample) {
 
 			//this is how you get data from the inputs
-			float data = buffer.getSample(channel, sample);
-
-			float currentSample = data;
+            data = buffer.getSample(channel, sample);
 
 			//how to synthesize noise
 			//data = random.nextFloat() * 0.25f - 0.125f;
-			
-			//upsampling.  Interpolate between the current sample and the previous sample
-			float upSamples[UPSAMPLING];
-			for (int i = 0; i < UPSAMPLING; i++) {
-				upSamples[i] = (prevSample[channel] * float(((float(UPSAMPLING) - 1) - i)/(float(UPSAMPLING) - 1))) + (data * float(i/(float(UPSAMPLING) - 1)));
-			}
-			
-			//equalization
-			filterFreqScaled = 20000.0f *  pow(filterFreqVal, 3.0);
-			filterFreqScaled = fcSmoothing.process(filterFreqScaled);
-			filter2FreqScaled = 20000.0f *  pow(filter2FreqVal, 3.0);
-			filter2FreqScaled = fc2Smoothing.process(filter2FreqScaled);
-			svfilter[channel].setFc(filterFreqScaled, UPSAMPLING);
-			svfilter[channel].setQ(filterQVal);
-			svfilter2[channel].setFc(filter2FreqScaled, UPSAMPLING);
-			svfilter2[channel].setQ(filter2QVal);
-
+            
 			//upsampling loop
 			for (int i = 0; i < UPSAMPLING - 1; i++) {
-				upSamples[i] = svfilter[channel].process(upSamples[i], 2);
-				upSamples[i] = svfilter2[channel].process(upSamples[i], 0);
+				data2 = (prevSample[channel] * float(((float(UPSAMPLING) - 1) - i)/(float(UPSAMPLING) - 1))) + (data * float(i/(float(UPSAMPLING) - 1)));
+                data2 = svfilter[channel].processHP(data2);
+                upSamples[i] = data2;
+            }
+            //upsample by half the amount for the highpass (it's high cutoff operation is not nearly as critical as nothing will really be getting through as opposed to the entire signal
+            for(int i = 0; i < UPSAMPLING; i += 2){
+                data2 = svfilter2[channel].processLP(data2);
 			}
-			 
-			//do "decimation"
-			data = upSamples[UPSAMPLING - 2]; 
 
 			//apply a delay
-			float oscAmtValScaled =  50.0f   * oscAmtVal;										//amount in samples of modulation
-			float oscFreqValScaled = 2.0f    * freqSmoothing.process(oscFreqVal);				//frequency (roughly) of modulation
 			delay[channel].updateIndex(delayVal, oscAmtValScaled, oscFreqValScaled, channel);
-			delay[channel].write((data + feedbackVal * delay[channel].read()));
-			data = dryVal * data + wetVal * delay[channel].read();
+			delay[channel].write((data2 + feedbackVal * delay[channel].read()));
+			data2 = dryVal * data2 + wetVal * delay[channel].read();
 
-			buffer.setSample(channel, sample, data);
+			buffer.setSample(channel, sample, data2);
 
-			prevSample[channel] = currentSample;
+			prevSample[channel] = data;
 
 		}
 	}

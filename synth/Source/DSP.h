@@ -118,7 +118,7 @@ public:
     }
     
     void setSpeed(float Speed){
-        speed = Speed / SAMPLINGFREQ;
+        speed = Speed / SAMPLINGFREQ * 20.0f;
     }
     
     float process(void){

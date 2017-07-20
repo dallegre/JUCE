@@ -10,7 +10,7 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
-
+#include <math.h>
 
 //==============================================================================
 Juce_vst2AudioProcessorEditor::Juce_vst2AudioProcessorEditor (Juce_vst2AudioProcessor& p)
@@ -133,11 +133,11 @@ Juce_vst2AudioProcessorEditor::Juce_vst2AudioProcessorEditor (Juce_vst2AudioProc
 //add listener function for volume slider
 void Juce_vst2AudioProcessorEditor::sliderValueChanged(Slider* slider) {
 
-	processor.filterFreqVal = filterFreqSlider.getValue();
-	processor.filterQVal = filterQSlider.getValue();
+	processor.filterFreqVal =  filterFreqSlider.getValue();
+	processor.filterQVal =     filterQSlider.getValue();
 
 	processor.filter2FreqVal = filter2FreqSlider.getValue();
-	processor.filter2QVal = filter2QSlider.getValue();
+	processor.filter2QVal =    filter2QSlider.getValue();
 
 	processor.dryVal =         drySlider.getValue();
 	processor.wetVal =         wetSlider.getValue();
@@ -145,6 +145,19 @@ void Juce_vst2AudioProcessorEditor::sliderValueChanged(Slider* slider) {
 	processor.delayVal =       delaySlider.getValue();
 	processor.oscAmtVal =      oscAmtSlider.getValue();
 	processor.oscFreqVal =     oscFreqSlider.getValue();
+    
+    processor.filterFreqScaled =  10000.0f *  pow(processor.filterFreqVal, 3.0);
+    processor.filter2FreqScaled = 20000.0f *  pow(processor.filter2FreqVal, 3.0);
+    
+    processor.oscAmtValScaled =  50.0f *   processor.oscAmtVal;
+    processor.oscFreqValScaled = 2.0f *    processor.oscFreqVal;
+
+    for(int i = 0; i < 2; i++){
+        processor.svfilter[i].setFc(processor.filterFreqScaled, UPSAMPLING);
+        processor.svfilter[i].setQ(processor.filterQVal);
+        processor.svfilter2[i].setFc(processor.filter2FreqScaled, UPSAMPLING);
+        processor.svfilter2[i].setQ(processor.filter2QVal);
+    }
 
 }
 

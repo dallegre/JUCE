@@ -98,27 +98,21 @@ void SynthAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     env.prepareToPlay();
     env.setSpeed(1.0f);
     
-    osc[0].prepareToPlay();
-    osc[1].prepareToPlay();
-    osc2[0].prepareToPlay();
-    osc2[1].prepareToPlay();
-    filter[0].prepareToPlay();
-    filter[1].prepareToPlay();
+    osc.prepareToPlay();
+    osc2.prepareToPlay();
+    filter.prepareToPlay();
     
-    ampSmoothing[0].prepareForPlay();
-    ampSmoothing[1].prepareForPlay();
+    ampSmoothing.prepareForPlay();
 
-    freqSmoothing[0].prepareForPlay();
-    freqSmoothing[1].prepareForPlay();
-    freqSmoothing2[0].prepareForPlay();
-    freqSmoothing2[1].prepareForPlay();
+    freqSmoothing.prepareForPlay();
+    freqSmoothing2.prepareForPlay();
 
     oscVal = 0.5f;
     detVal = 0.5f;
-    freqVal = 0.1f;
+    freqVal = 0.2f;
     qVal = 0.5f;
-    envVal = 0.6f;
-    speedVal = 0.4f;
+    envVal = 0.9f;
+    speedVal = 0.6f;
     
     freqValScaled = 20000.0f * pow(freqVal, 3.0f);
     envValScaled =  1000.0f *  pow(envVal, 3.0f);
@@ -170,7 +164,6 @@ void SynthAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& m
     // when they first compile a plugin, but obviously you don't need to keep
     // this code if your algorithm always overwrites all the output channels.
 
-    
     MidiBuffer Midi;
     int time;
     MidiMessage m;
@@ -189,8 +182,7 @@ void SynthAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& m
             env.reset();
             //handle the pitch of the note
             noteVal = m.getNoteNumber();
-            osc[0].setF(m.getMidiNoteInHertz(noteVal));
-            osc[1].setF(m.getMidiNoteInHertz(noteVal));
+            osc.setF(m.getMidiNoteInHertz(noteVal));
         }else{
             monoNoteOn = 0.0f;
         }
@@ -200,26 +192,31 @@ void SynthAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& m
         buffer.clear (i, 0, buffer.getNumSamples());
 
     for (int channel = 0; channel < totalNumOutputChannels; ++channel){
-        for(int sample = 0; sample < buffer.getNumSamples(); ++sample){
-            
-            filter[channel].setFc((freqValScaled + (envValScaled * pow(env.process(),3.0f)))/UPSAMPLING);
-            env.setSpeed(speedValScaled);
-            filter[channel].setQ(qVal);
-            float freqency =  freqSmoothing[channel].process((exp((noteVal + oscValScaled)/17.31f) + random.nextFloat()*5.0f)/UPSAMPLING);
-            float freqency2 = freqSmoothing2[channel].process((exp((noteVal + oscValScaled + detValScaled)/17.31f) + random.nextFloat()*5.0f)/UPSAMPLING);
-            osc[channel].setF(freqency);
-            osc2[channel].setF(freqency2);
-            float monoNoteOn2 = ampSmoothing[channel].process(monoNoteOn);
-            
-            float data;
-            
-            for(int i = 0; i < UPSAMPLING; i++){
-                data = 30.0f * filter[channel].process(0.05f * osc[channel].process() + 0.05f * osc2[channel].process());
+        
+        //just do the synth stuff on one channel.
+        if(channel == 0){
+            for(int sample = 0; sample < buffer.getNumSamples(); ++sample){
+                
+                filter.setFc((freqValScaled + (envValScaled * pow(env.process(),3.0f)))/UPSAMPLING);
+                env.setSpeed(speedValScaled);
+                filter.setQ(qVal);
+                float freqency =  freqSmoothing.process((exp((noteVal + oscValScaled)/17.31f) + random.nextFloat()*5.0f)/UPSAMPLING);
+                float freqency2 = freqSmoothing2.process((exp((noteVal + oscValScaled + detValScaled)/17.31f) + random.nextFloat()*5.0f)/UPSAMPLING);
+                osc.setF(freqency);
+                osc2.setF(freqency2);
+                float monoNoteOn2 = ampSmoothing.process(monoNoteOn);
+                
+                float data;
+                
+                for(int i = 0; i < UPSAMPLING; i++){
+                    data = 30.0f * filter.process(0.05f * osc.process() + 0.05f * osc2.process());
+                }
+                
+                data *= monoNoteOn2;
+                
+                buffer.setSample(0, sample, data);
+                buffer.setSample(1, sample, data);
             }
-            
-            data *= monoNoteOn2;
-            
-            buffer.setSample(channel, sample, data);
         }
     }
 }

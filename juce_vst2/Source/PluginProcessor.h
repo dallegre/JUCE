@@ -12,6 +12,8 @@
 
 #include "Delay.h"
 
+#define UPSAMPLING 32
+
 #include "../JuceLibraryCode/JuceHeader.h"
 
 
@@ -79,7 +81,7 @@ public:
 
 	Delay delay[2];
 	stateVariable svfilter[2], svfilter2[2];
-	float prevSample[2];
+	float prevSample[2], data, data2, oscAmtValScaled,oscFreqValScaled, upSamples[UPSAMPLING];
 	OnePoleLp freqSmoothing, fcSmoothing, fc2Smoothing;
 
 private:

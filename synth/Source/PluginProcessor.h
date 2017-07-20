@@ -58,9 +58,9 @@ public:
 
     int noteOn;
     float monoNoteOn, noteVal;
-    Osc osc[2], osc2[2];
-    Filter filter[2];
-    OnePoleLP ampSmoothing[2], freqSmoothing[2], freqSmoothing2[2];
+    Osc osc, osc2;
+    Filter filter;
+    OnePoleLP ampSmoothing, freqSmoothing, freqSmoothing2;
     Env env;
     float freqVal, qVal, freqValScaled, oscVal, oscValScaled, envVal, envValScaled, speedVal, speedValScaled,
         detVal, detValScaled;
