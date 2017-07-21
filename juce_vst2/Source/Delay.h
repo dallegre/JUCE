@@ -61,7 +61,7 @@ public:
 	}
 
 	float read(void) {
-		if ((delayReadIndex < DELAYSIZE) && (delayReadIndex > 0)) {
+		if ((delayReadIndex < DELAYSIZE) && (delayReadIndex >= 0)) {
 			if(delayReadIndex+1 < DELAYSIZE){
 				return linterp(delay[delayReadIndex], delay[delayReadIndex+1], delaySizeFrac);
 			}else{
@@ -73,7 +73,7 @@ public:
 	}
 
 	void write(float input) {
-		if ((delayWriteIndex < DELAYSIZE) && (delayWriteIndex > 0)) {
+		if ((delayWriteIndex < DELAYSIZE) && (delayWriteIndex >= 0)) {
 			delay[delayWriteIndex] = input;
 		}
 	}

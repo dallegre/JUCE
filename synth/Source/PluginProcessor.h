@@ -56,17 +56,19 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-    int noteOn;
+    float freqVal, qVal, freqValScaled, oscVal, oscValScaled, envVal, envValScaled, speedVal, speedValScaled,
+        detVal, detValScaled;
+    
+private:
+    
+    int noteOn, prepareToPlayDone = 0;
     float monoNoteOn, noteVal;
     Osc osc, osc2;
     Filter filter;
     OnePoleLP ampSmoothing, freqSmoothing, freqSmoothing2;
     Env env;
-    float freqVal, qVal, freqValScaled, oscVal, oscValScaled, envVal, envValScaled, speedVal, speedValScaled,
-        detVal, detValScaled;
     Random random;
     
-private:
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SynthAudioProcessor)
 };

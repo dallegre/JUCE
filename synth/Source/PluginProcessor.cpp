@@ -91,34 +91,40 @@ void SynthAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
-    
-    noteOn = 0;
-    monoNoteOn = 0.0f;
-    
-    env.prepareToPlay();
-    env.setSpeed(1.0f);
-    
-    osc.prepareToPlay();
-    osc2.prepareToPlay();
-    filter.prepareToPlay();
-    
-    ampSmoothing.prepareForPlay();
 
-    freqSmoothing.prepareForPlay();
-    freqSmoothing2.prepareForPlay();
-
-    oscVal = 0.5f;
-    detVal = 0.5f;
-    freqVal = 0.2f;
-    qVal = 0.5f;
-    envVal = 0.9f;
-    speedVal = 0.6f;
+	if (!prepareToPlayDone) {
     
-    freqValScaled = 20000.0f * pow(freqVal, 3.0f);
-    envValScaled =  1000.0f *  pow(envVal, 3.0f);
-    speedValScaled = (1.0f -  speedVal);
-    oscValScaled =   (oscVal - 0.5f) * 70.0f;
-    detValScaled =   (detVal - 0.5f) * 7.0f;
+        noteOn = 0;
+        monoNoteOn = 0.0f;
+        
+        env.prepareToPlay();
+        env.setSpeed(1.0f);
+        
+        osc.prepareToPlay();
+        osc2.prepareToPlay();
+        filter.prepareToPlay();
+        
+        ampSmoothing.prepareForPlay();
+
+        freqSmoothing.prepareForPlay();
+        freqSmoothing2.prepareForPlay();
+
+        oscVal = 0.5f;
+        detVal = 0.5f;
+        freqVal = 0.2f;
+        qVal = 0.5f;
+        envVal = 0.9f;
+        speedVal = 0.6f;
+        
+        freqValScaled = 20000.0f * pow(freqVal, 3.0f);
+        envValScaled =  10000.0f *  pow(envVal, 3.0f);
+        speedValScaled = pow((1.0f -  speedVal),2.0f);
+        oscValScaled =   (oscVal - 0.5f) * 70.0f;
+        detValScaled =   (detVal - 0.5f) * 7.0f;
+        
+        prepareToPlayDone = 1;
+    
+    }
     
 }
 
