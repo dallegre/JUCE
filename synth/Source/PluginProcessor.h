@@ -64,6 +64,7 @@ private:
     int noteOn, prepareToPlayDone = 0;
     float monoNoteOn, noteVal;
     Osc osc, osc2;
+    gsOsc modOsc;
     Filter filter;
     OnePoleLP ampSmoothing, driftSmoothing, driftSmoothing2, freqSmoothing;
     Env env;

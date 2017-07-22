@@ -84,6 +84,7 @@ private:
 	Random random;
 
 	Delay delay[2];
+    gsOsc modOsc;
 	float prevSample[2], data, data2, upSamples[UPSAMPLING];
 	OnePoleLp freqSmoothing, fcSmoothing, fc2Smoothing;
 

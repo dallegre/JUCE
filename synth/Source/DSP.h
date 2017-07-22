@@ -66,12 +66,12 @@ public:
     float process(float input){
         z1 = (input - q*feedback)*a0 + z1*b1;
 		z1 = tanh(z1);
-        z2 = z1*(1 - (b1 * 1.0001)) + z2*(b1 * 1.0001);
-		z2 = tanh(z2);
-        z3 = z2*(1 - (b1 * 0.999)) + z3*(b1 * 0.999);
-		z3 = tanh(z3);
+        z2 = z1*(1 - (b1 * 1.00002)) + z2*(b1 * 1.00002);
+		//z2 = tanh(z2);
+        z3 = z2*(1 - (b1 * 0.9994)) + z3*(b1 * 0.9994);
+		//z3 = tanh(z3);
         lp = z3*(1 - (b1 * 1.00005)) + feedback*(b1 * 1.00005); 
-		lp = tanh(lp);
+		//lp = tanh(lp);
         feedback = lp;
 		lp *= 1 + q / 3.0f;
         return lp;
@@ -93,8 +93,8 @@ public:
         z1 = 0.0f;
     }
     
-    void setFc2(float freqArg){
-        b1 = exp(-2.0f * 3.14159f * freqArg / SAMPLINGFREQ);
+    void setFc2(float freq){
+        b1 = exp(-2.0f * 3.14159f * freq / SAMPLINGFREQ);
         a0 = 1.0f - b1;
     }
     
@@ -106,6 +106,54 @@ public:
 private:
     float a0, b1, z1;
 };
+
+
+class gsOsc {
+public:
+    
+    gsOsc() {}
+    
+    ~gsOsc() {};
+    
+    void setF(float frequency, float amp) {
+        fw = float(2.0)*pi*frequency / fs;
+        eps = float(2.0)*sin(fw / float(2.0));
+        amp2 = amp;
+    }
+    
+    void prepareForPlay(void){
+        yn = 0;					//initial condition sine(0) = 0
+        yq = 1;					//initial condition cos(0) = 1
+        yn_1 = 1, yq_1 = 0;     //hmm...
+        pi = 3.14159;
+        fs = SAMPLINGFREQ;
+    }
+    
+    float process(int quad) {
+        yq = yq_1 - eps*yn_1;
+        yn = eps*yq + yn_1;
+        yn_1 = yn;
+        yq_1 = yq;
+        //check to see if it's going crazy
+        if ((yq > 3.0f) || (yq < -3.0f)) {
+            yn = 0; yq = 1; yn_1 = 1; yq_1 = 0;
+            return 0;
+        }
+        else {
+            if (quad)
+                return yn*amp2;
+            else
+                return yq*amp2;
+        }
+    }
+    
+private:
+    
+    //put variables here that you'll use within process
+    float yn, yq, yn_1, yq_1, fw, pi, fs, eps, amp2;
+    
+};
+
 
 
 class Env{
