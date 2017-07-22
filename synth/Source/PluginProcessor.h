@@ -57,7 +57,7 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
     float freqVal, qVal, freqValScaled, oscVal, oscValScaled, envVal, envValScaled, speedVal, speedValScaled,
-        detVal, detValScaled;
+        detVal, detValScaled, ampVal;
     
 private:
     
@@ -65,7 +65,7 @@ private:
     float monoNoteOn, noteVal;
     Osc osc, osc2;
     Filter filter;
-    OnePoleLP ampSmoothing, freqSmoothing, freqSmoothing2;
+    OnePoleLP ampSmoothing, driftSmoothing, driftSmoothing2, freqSmoothing;
     Env env;
     Random random;
     

@@ -65,10 +65,15 @@ public:
     
     float process(float input){
         z1 = (input - q*feedback)*a0 + z1*b1;
-        z2 = z1*a0 + z2*b1;
-        z3 = z2*a0 + z3*b1;
-        lp = z3*a0 + lp*b1;
+		z1 = tanh(z1);
+        z2 = z1*(1 - (b1 * 1.0001)) + z2*(b1 * 1.0001);
+		z2 = tanh(z2);
+        z3 = z2*(1 - (b1 * 0.999)) + z3*(b1 * 0.999);
+		z3 = tanh(z3);
+        lp = z3*(1 - (b1 * 1.00005)) + feedback*(b1 * 1.00005); 
+		lp = tanh(lp);
         feedback = lp;
+		lp *= 1 + q / 3.0f;
         return lp;
     }
     

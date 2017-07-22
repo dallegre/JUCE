@@ -22,21 +22,28 @@ SynthAudioProcessorEditor::SynthAudioProcessorEditor (SynthAudioProcessor& p)
     setSize (230, 300);
     
     oscSlider.setSliderStyle(Slider::LinearBarVertical);
-    oscSlider.setRange(0.0, 1.0, 0.01);
+    oscSlider.setRange(0.0, 1.0, 0.001);
     oscSlider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
     oscSlider.setPopupDisplayEnabled(true, this);
     oscSlider.setTextValueSuffix(" freq");
     oscSlider.setValue(processor.oscVal);
     
     detSlider.setSliderStyle(Slider::LinearBarVertical);
-    detSlider.setRange(0.0, 1.0, 0.01);
+    detSlider.setRange(0.0, 1.0, 0.001);
     detSlider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
     detSlider.setPopupDisplayEnabled(true, this);
     detSlider.setTextValueSuffix(" detune");
     detSlider.setValue(processor.detVal);
+
+	ampSlider.setSliderStyle(Slider::LinearBarVertical);
+	ampSlider.setRange(0.0, 1.0, 0.01);
+	ampSlider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
+	ampSlider.setPopupDisplayEnabled(true, this);
+	ampSlider.setTextValueSuffix(" amp");
+	ampSlider.setValue(processor.ampVal);
     
     freqSlider.setSliderStyle(Slider::LinearBarVertical);
-    freqSlider.setRange(0.0, 1.0, 0.01);
+    freqSlider.setRange(0.0, 1.0, 0.001);
     freqSlider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
     freqSlider.setPopupDisplayEnabled(true, this);
     freqSlider.setTextValueSuffix(" freq");
@@ -65,6 +72,7 @@ SynthAudioProcessorEditor::SynthAudioProcessorEditor (SynthAudioProcessor& p)
     
     addAndMakeVisible(&oscSlider);
     addAndMakeVisible(&detSlider);
+	addAndMakeVisible(&ampSlider);
     addAndMakeVisible(&freqSlider);
     addAndMakeVisible(&qSlider);
     addAndMakeVisible(&envSlider);
@@ -72,6 +80,7 @@ SynthAudioProcessorEditor::SynthAudioProcessorEditor (SynthAudioProcessor& p)
     
     oscSlider.addListener(this);
     detSlider.addListener(this);
+	ampSlider.addListener(this);
     freqSlider.addListener(this);
     qSlider.addListener(this);
     envSlider.addListener(this);
@@ -83,6 +92,7 @@ void SynthAudioProcessorEditor::sliderValueChanged(Slider* slider){
     
     processor.oscVal =   oscSlider.getValue();
     processor.detVal =   detSlider.getValue();
+	processor.ampVal =   ampSlider.getValue();
     processor.freqVal =  freqSlider.getValue();
     processor.qVal =     qSlider.getValue();
     processor.envVal =   envSlider.getValue();
@@ -92,7 +102,7 @@ void SynthAudioProcessorEditor::sliderValueChanged(Slider* slider){
     processor.envValScaled =  10000.0f *  pow(processor.envVal, 3.0f);
     processor.speedValScaled = pow((1.0f -  processor.speedVal),2.0f);
     processor.oscValScaled =   (processor.oscVal - 0.5f) * 60.0f;
-    processor.detValScaled =   (processor.detVal - 0.5f) * 12.0f;
+    processor.detValScaled =   (processor.detVal - 0.5f) * 24.0f;
 
 }
 
@@ -111,10 +121,11 @@ void SynthAudioProcessorEditor::paint (Graphics& g)
 
     g.drawFittedText("Osc",  30,  20, getWidth(), 30, Justification::bottom, 1);
     g.drawFittedText("Det",  60,  20, getWidth(), 30, Justification::bottom, 1);
-    g.drawFittedText("Freq", 90,  20, getWidth(), 30, Justification::bottom, 1);
-    g.drawFittedText("Res",  120, 20, getWidth(), 30, Justification::bottom, 1);
-    g.drawFittedText("Env",  150, 20, getWidth(), 30, Justification::bottom, 1);
-    g.drawFittedText("Rate", 180, 20, getWidth(), 30, Justification::bottom, 1);
+	g.drawFittedText("Amp",  90,  20, getWidth(), 30, Justification::bottom, 1);
+    g.drawFittedText("Freq", 120, 20, getWidth(), 30, Justification::bottom, 1);
+    g.drawFittedText("Res",  150, 20, getWidth(), 30, Justification::bottom, 1);
+    g.drawFittedText("Env",  180, 20, getWidth(), 30, Justification::bottom, 1);
+    g.drawFittedText("Rate", 210, 20, getWidth(), 30, Justification::bottom, 1);
 } 
 
 void SynthAudioProcessorEditor::resized()
@@ -123,8 +134,9 @@ void SynthAudioProcessorEditor::resized()
     // subcomponents in your editor..
     oscSlider.setBounds(  30,  50, 20, getHeight() - 90);
     detSlider.setBounds(  60,  50, 20, getHeight() - 90);
-    freqSlider.setBounds( 90,  50, 20, getHeight() - 90);
-    qSlider.setBounds(    120, 50, 20, getHeight() - 90);
-    envSlider.setBounds(  150, 50, 20, getHeight() - 90);
-    speedSlider.setBounds(180, 50, 20, getHeight() - 90);
+	ampSlider.setBounds(  90,  50, 20, getHeight() - 90);
+    freqSlider.setBounds( 120, 50, 20, getHeight() - 90);
+    qSlider.setBounds(    150, 50, 20, getHeight() - 90);
+    envSlider.setBounds(  180, 50, 20, getHeight() - 90);
+    speedSlider.setBounds(210, 50, 20, getHeight() - 90);
 }

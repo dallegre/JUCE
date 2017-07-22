@@ -34,6 +34,7 @@ private:
 
     Slider oscSlider;
     Slider detSlider;
+	Slider ampSlider;
     
     Slider freqSlider;
     Slider qSlider;

@@ -24,7 +24,7 @@ Juce_vst2AudioProcessorEditor::Juce_vst2AudioProcessorEditor (Juce_vst2AudioProc
 	//the constructor gets called every time you click on the plugin so initialize everything at prepare to play
 	//set up parameters for the slider
 	filterFreqSlider.setSliderStyle(Slider::LinearBarVertical);
-	filterFreqSlider.setRange(0.0, 1.0, 0.01);
+	filterFreqSlider.setRange(0.0, 1.0, 0.001);
 	filterFreqSlider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
 	filterFreqSlider.setPopupDisplayEnabled(true, this);
 	filterFreqSlider.setTextValueSuffix(" Cutoff");
@@ -40,7 +40,7 @@ Juce_vst2AudioProcessorEditor::Juce_vst2AudioProcessorEditor (Juce_vst2AudioProc
 
 
 	filter2FreqSlider.setSliderStyle(Slider::LinearBarVertical);
-	filter2FreqSlider.setRange(0.0, 1.0, 0.01);
+	filter2FreqSlider.setRange(0.0, 1.0, 0.001);
 	filter2FreqSlider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
 	filter2FreqSlider.setPopupDisplayEnabled(true, this);
 	filter2FreqSlider.setTextValueSuffix(" Cutoff");
@@ -78,7 +78,7 @@ Juce_vst2AudioProcessorEditor::Juce_vst2AudioProcessorEditor (Juce_vst2AudioProc
 	feedbackSlider.setValue(processor.feedbackVal);
 
 	delaySlider.setSliderStyle(Slider::LinearBarVertical);
-	delaySlider.setRange(0.0, 1.0, 0.01);
+	delaySlider.setRange(0.0, 1.0, 0.001);
 	delaySlider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
 	delaySlider.setPopupDisplayEnabled(true, this);
 	delaySlider.setTextValueSuffix(" Delay");
@@ -142,7 +142,7 @@ void Juce_vst2AudioProcessorEditor::sliderValueChanged(Slider* slider) {
 	processor.dryVal =         drySlider.getValue();
 	processor.wetVal =         wetSlider.getValue();
 	processor.feedbackVal =    feedbackSlider.getValue();
-	processor.delayVal =       delaySlider.getValue();
+	processor.delayVal =	   delaySlider.getValue();
 	processor.oscAmtVal =      oscAmtSlider.getValue();
 	processor.oscFreqVal =     oscFreqSlider.getValue();
     

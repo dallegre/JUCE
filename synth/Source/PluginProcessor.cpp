@@ -12,7 +12,7 @@
 #include "PluginEditor.h"
 #include <math.h>
 
-#define UPSAMPLING 32
+#define UPSAMPLING 64
 
 //==============================================================================
 SynthAudioProcessor::SynthAudioProcessor()
@@ -105,12 +105,18 @@ void SynthAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
         filter.prepareToPlay();
         
         ampSmoothing.prepareForPlay();
+		driftSmoothing.prepareForPlay();
+		driftSmoothing2.prepareForPlay();
+		freqSmoothing.prepareForPlay();
 
-        freqSmoothing.prepareForPlay();
-        freqSmoothing2.prepareForPlay();
+		ampSmoothing.setFc2(200.0f);			//slow enough to avoid clicks, but fast enough to be snappy
+		driftSmoothing.setFc2(0.1f);			//want this to be pretty slow, mimick oscillator drift
+		driftSmoothing2.setFc2(0.1f);
+		freqSmoothing.setFc2(200.0f);
 
         oscVal = 0.5f;
         detVal = 0.5f;
+		ampVal = 0.5f;
         freqVal = 0.2f;
         qVal = 0.5f;
         envVal = 0.9f;
@@ -203,19 +209,20 @@ void SynthAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& m
         if(channel == 0){
             for(int sample = 0; sample < buffer.getNumSamples(); ++sample){
                 
-                filter.setFc((freqValScaled + (envValScaled * pow(env.process(),3.0f)))/UPSAMPLING);
+                filter.setFc(freqSmoothing.process(freqValScaled + (envValScaled * pow(env.process(),3.0f))) / UPSAMPLING);
                 env.setSpeed(speedValScaled);
                 filter.setQ(qVal);
-                float freqency =  freqSmoothing.process((exp((noteVal + oscValScaled)/17.31f) + random.nextFloat()*5.0f)/UPSAMPLING);
-                float freqency2 = freqSmoothing2.process((exp((noteVal + oscValScaled + detValScaled)/17.31f) + random.nextFloat()*5.0f)/UPSAMPLING);
-                osc.setF(freqency);
-                osc2.setF(freqency2);
+				float frequency = noteVal + 24.0f + oscValScaled + (driftSmoothing.process((random.nextFloat() * 0.5f) - 0.25f) * 20.0f);
+                float frequency2 = exp((frequency + detValScaled + (driftSmoothing2.process(random.nextFloat() * 0.5f - 0.25f) * 20.0f)) / 17.31f) / UPSAMPLING;
+				frequency = exp(frequency / 17.31f) / UPSAMPLING;
+				osc.setF(frequency);
+                osc2.setF(frequency2);
                 float monoNoteOn2 = ampSmoothing.process(monoNoteOn);
                 
                 float data;
                 
                 for(int i = 0; i < UPSAMPLING; i++){
-                    data = 30.0f * filter.process(0.05f * osc.process() + 0.05f * osc2.process());
+                    data = 30.0f * filter.process(0.08f * osc.process() + ampVal * 0.1f * osc2.process());
                 }
                 
                 data *= monoNoteOn2;
