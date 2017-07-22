@@ -19,7 +19,7 @@ SynthAudioProcessorEditor::SynthAudioProcessorEditor (SynthAudioProcessor& p)
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    setSize (230, 300);
+    setSize (250, 300);
     
     oscSlider.setSliderStyle(Slider::LinearBarVertical);
     oscSlider.setRange(0.0, 1.0, 0.001);

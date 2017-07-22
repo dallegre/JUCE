@@ -12,7 +12,7 @@
 #include "PluginEditor.h"
 #include <math.h>
 
-#define UPSAMPLING 64
+#define UPSAMPLING 32
 
 //==============================================================================
 SynthAudioProcessor::SynthAudioProcessor()
