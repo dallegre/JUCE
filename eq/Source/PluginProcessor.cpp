@@ -11,6 +11,8 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+#include <math.h>
+
 
 //==============================================================================
 EqAudioProcessor::EqAudioProcessor()
@@ -90,17 +92,27 @@ void EqAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     if(!prepareToPlayDone){
         amp1Val = 0.5f;
         amp2Val = 0.5f;
-        freq1Val = 0.3f;
-        freq2Val = 0.6f;
+		amp3Val = 0.5f;
+        freq1Val = 0.2f;
+        freq2Val = 0.5f;
+		freq3Val = 0.8f;
+		q1Val = 0.5f;
+		q2Val = 0.5f;
+		q3Val = 0.5f;
+		gainVal = 1.0f;
         amp1ValScaled  = (amp1Val - 0.5f);
         amp2ValScaled  = (amp2Val - 0.5f);
-        freq1ValScaled = 5000.0f * freq1Val;
-        freq2ValScaled = 5000.0f * freq2Val;
+		amp3ValScaled =  (amp3Val - 0.5f);
+        freq1ValScaled = 10000.0f * pow(freq1Val, 3.0f);
+        freq2ValScaled = 10000.0f * pow(freq2Val, 3.0f);
+		freq3ValScaled = 10000.0f * pow(freq3Val, 3.0f);
         for(int i = 0; i < 2; i++){
             filter1[i].prepareToPlay();
             filter2[i].prepareToPlay();
+			filter3[i].prepareToPlay();
             filter1[i].setFc(freq1ValScaled, amp1ValScaled, 6.0f);
             filter2[i].setFc(freq2ValScaled, amp2ValScaled, 6.0f);
+			filter3[i].setFc(freq3ValScaled, amp3ValScaled, 6.0f);
         }
         prepareToPlayDone = 1;
     }
@@ -158,6 +170,8 @@ void EqAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
             data = buffer.getSample(channel, sample);
             data = filter1[channel].process(data);
             data = filter2[channel].process(data);
+			data = filter3[channel].process(data);
+			data *= gainVal;
 			buffer.setSample(channel, sample, data);
         }
     }

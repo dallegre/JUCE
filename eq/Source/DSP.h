@@ -12,10 +12,10 @@ public:
     
     void prepareToPlay(void){
         
-        setFc(100.0f, 0.0f, 6.0f);
+        setFc(100.0f, 0.0f, 0.5f);
         
-        a1 = 0.0f;
-        d0 = 1.0f;
+        a1   = 0.0f;
+        d0   = 1.0f;
         
         ip_1 = 0.0f;
         ip_2 = 0.0f;
@@ -28,9 +28,9 @@ public:
     
     void setFc(float freq, float amp, float Q){
         
-        q = 6.0f;
+        q = 0.5f + 3.0f * Q;
         
-        amp *= 20.0f;
+        amp *= 30.0f;
         
         mu = pow(10.0f, amp / 20.0f);
         zeta = 4.0f / (1.0f + mu);

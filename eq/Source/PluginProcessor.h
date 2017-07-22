@@ -57,9 +57,13 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
     
-    float amp1Val, amp2Val, freq1Val, freq2Val, data, amp1ValScaled, freq1ValScaled, amp2ValScaled,
-    freq2ValScaled;
-    Peaking filter1[2], filter2[2];
+    float amp1Val, amp2Val, amp3Val, 
+		freq1Val, freq2Val, freq3Val, 
+		amp1ValScaled, amp2ValScaled, amp3ValScaled,
+		freq1ValScaled, freq2ValScaled, freq3ValScaled, 
+		q1Val, q2Val, q3Val, 
+		data, gainVal;
+    Peaking filter1[2], filter2[2], filter3[2];
     int prepareToPlayDone = 0;
 
 private:

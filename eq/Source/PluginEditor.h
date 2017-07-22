@@ -32,7 +32,10 @@ private:
     // access the processor object that created it.
     EqAudioProcessor& processor;
     
-    Slider amp1Slider, freq1Slider, amp2Slider, freq2Slider;
+    Slider amp1Slider, freq1Slider, q1Slider, 
+		amp2Slider, freq2Slider, q2Slider,
+		amp3Slider, freq3Slider, q3Slider,
+		gainSlider;
     
 	void sliderValueChanged(Slider* slider) override;
 
