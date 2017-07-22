@@ -222,7 +222,7 @@ void SynthAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& m
                 float data;
                 
                 for(int i = 0; i < UPSAMPLING; i++){
-                    data = 30.0f * filter.process(0.08f * osc.process() + ampVal * 0.1f * osc2.process());
+                    data = 20.0f * filter.process(0.1f * osc.process() + ampVal * 0.1f * osc2.process());
                 }
                 
                 data *= monoNoteOn2;
