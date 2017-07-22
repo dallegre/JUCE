@@ -107,6 +107,7 @@ void Juce_vst2AudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
 		oscAmtVal =   0.7f;
 		oscFreqVal =  0.3f;
         
+        
         oscAmtValScaled =  50.0f   * oscAmtVal;
         oscFreqValScaled = 2.0f *    oscFreqVal;
 

@@ -12,7 +12,7 @@
 #include "PluginEditor.h"
 #include <math.h>
 
-#define UPSAMPLING 32
+#define UPSAMPLING 64
 
 //==============================================================================
 SynthAudioProcessor::SynthAudioProcessor()
@@ -108,6 +108,8 @@ void SynthAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 		driftSmoothing.prepareForPlay();
 		driftSmoothing2.prepareForPlay();
 		freqSmoothing.prepareForPlay();
+        modOsc.prepareForPlay();
+        modOsc.setF(0.1f,0.05f);
 
 		ampSmoothing.setFc2(200.0f);			//slow enough to avoid clicks, but fast enough to be snappy
 		driftSmoothing.setFc2(0.1f);			//want this to be pretty slow, mimick oscillator drift
@@ -212,7 +214,7 @@ void SynthAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& m
                 filter.setFc(freqSmoothing.process(freqValScaled + (envValScaled * pow(env.process(),3.0f))) / UPSAMPLING);
                 env.setSpeed(speedValScaled);
                 filter.setQ(qVal);
-				float frequency = noteVal + 24.0f + oscValScaled + (driftSmoothing.process((random.nextFloat() * 0.5f) - 0.25f) * 20.0f);
+				float frequency = noteVal + 24.0f + oscValScaled + modOsc.process(0) + (driftSmoothing.process((random.nextFloat() * 0.5f) - 0.25f) * 20.0f);
                 float frequency2 = exp((frequency + detValScaled + (driftSmoothing2.process(random.nextFloat() * 0.5f - 0.25f) * 20.0f)) / 17.31f) / UPSAMPLING;
 				frequency = exp(frequency / 17.31f) / UPSAMPLING;
 				osc.setF(frequency);
