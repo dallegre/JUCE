@@ -98,6 +98,7 @@ void SynthAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
         monoNoteOn = 0.0f;
         
         env.prepareToPlay();
+        env.setSampleRate(sampleRate);
         env.setSpeed(1.0f);
         
         osc.prepareToPlay();
