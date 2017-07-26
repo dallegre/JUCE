@@ -112,9 +112,11 @@ void Juce_vst2AudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
         oscFreqValScaled = 2.0f *    oscFreqVal;
 
 		for (int i = 0; i < 2; i++) {
-			delay[i].prepareToPlay();
+			delay[i].prepareToPlay(sampleRate);
 			svfilter[i].prepareToPlay();
+            svfilter[i].setSamplingFreq(sampleRate);
 			svfilter2[i].prepareToPlay();
+            svfilter2[i].setSamplingFreq(sampleRate);
 			svfilter[i].setFc(filterFreqScaled, UPSAMPLING);
 			svfilter[i].setQ(0.0f);
 			svfilter2[i].setFc(filter2FreqScaled, UPSAMPLING);
@@ -124,7 +126,9 @@ void Juce_vst2AudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
         
         fcSmoothing.prepareToPlay();
         fc2Smoothing.prepareToPlay();
-		fcSmoothing.setFc(1.0f);
+        fcSmoothing.setSamplingFreq(sampleRate);
+        fc2Smoothing.setSamplingFreq(sampleRate);
+        fcSmoothing.setFc(1.0f);
 		fc2Smoothing.setFc(1.0f);
          
         data =  0.0f;

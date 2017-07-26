@@ -1,7 +1,5 @@
 #include <math.h>
 
-#define SAMPLINGFREQ 44100
-
 class OnePoleLp {
 
 public:
@@ -9,6 +7,10 @@ public:
 	OnePoleLp() { a0 = 1.0f; b1 = 0.0f; z1 = 0.0f; };
 	OnePoleLp(float Fc) { z1 = 0.0; setFc(Fc); };
 	~OnePoleLp() {};
+    
+    void setSamplingFreq(int sf){
+        SAMPLINGFREQ = sf;
+    }
 
 	void setFc(float Fc) {
 		b1 = exp(-2.0f * 3.14159f * Fc / SAMPLINGFREQ);
@@ -23,6 +25,7 @@ public:
 private:
 
 	float a0, b1, z1;
+    int SAMPLINGFREQ;
 
 };
 
@@ -36,13 +39,16 @@ public:
 		yq = 0;					//initial condition cos(0) = 1
 		yn_1 = 1, yq_1 = 0;     //hmm...
 		pi = 3.14159f;
-		fs = SAMPLINGFREQ;
 	}
 
 	~gsOsc() {};
+    
+    void setSamplingFreq(int sf){
+        SAMPLINGFREQ = sf;
+    }
 
 	void setF(float frequency, float amp) {
-		fw = 2.0f*pi*frequency / fs;
+		fw = 2.0f*pi*frequency / SAMPLINGFREQ;
 		eps = 2.0f*sin(fw / 2.0f);
 		amp2 = amp;
 	}
@@ -67,6 +73,7 @@ public:
 private:
 
 	//put variables here that you'll use within process
-	float yn, yq, yn_1, yq_1, fw, pi, fs, eps, amp2;
-
+	float yn, yq, yn_1, yq_1, fw, pi, eps, amp2;
+    int SAMPLINGFREQ;
+    
 };

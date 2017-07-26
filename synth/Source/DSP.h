@@ -9,13 +9,16 @@
 #ifndef DSP_h
 #define DSP_h
 
-#define SAMPLINGFREQ 44100
 #include <math.h>
 
 class Osc{
 public:
     Osc(){};
     ~Osc(){};
+    
+    void setSampleRate(int sf){
+        SAMPLINGFREQ = sf;
+    }
     
     void setF(float freq){
         phase = freq / SAMPLINGFREQ;
@@ -36,6 +39,7 @@ public:
     
 private:
     float phase, saw;
+    int SAMPLINGFREQ;
 };
 
 class Filter{
@@ -43,6 +47,10 @@ public:
     Filter(){};
     
     ~Filter(){};
+    
+    void setSampleRate(int sf){
+        SAMPLINGFREQ = sf;
+    }
     
     void setFc(float freq){
         b1 = exp(-2.0f * 3.14159f * freq / SAMPLINGFREQ);
@@ -83,6 +91,7 @@ public:
 private:
     float b1, a0;
     float z1, z2, z3, feedback, lp, q;
+    int SAMPLINGFREQ;
 };
 
 
@@ -90,6 +99,10 @@ class OnePoleLP{
 public:
     OnePoleLP(){};
     ~OnePoleLP(){};
+    
+    void setSampleRate(int sf){
+        SAMPLINGFREQ = sf;
+    }
     
     void prepareForPlay(void){
         setFc2(300.0f);
@@ -108,6 +121,7 @@ public:
     
 private:
     float a0, b1, z1;
+    int SAMPLINGFREQ;
 };
 
 
@@ -118,8 +132,12 @@ public:
     
     ~gsOsc() {};
     
+    void setSampleRate(int sf){
+        SAMPLINGFREQ = sf;
+    }
+    
     void setF(float frequency, float amp) {
-        fw = float(2.0)*pi*frequency / fs;
+        fw = float(2.0)*pi*frequency / SAMPLINGFREQ;
         eps = float(2.0)*sin(fw / float(2.0));
         amp2 = amp;
     }
@@ -129,7 +147,6 @@ public:
         yq = 1;					//initial condition cos(0) = 1
         yn_1 = 1, yq_1 = 0;     //hmm...
         pi = 3.14159;
-        fs = SAMPLINGFREQ;
     }
     
     float process(int quad) {
@@ -153,7 +170,8 @@ public:
 private:
     
     //put variables here that you'll use within process
-    float yn, yq, yn_1, yq_1, fw, pi, fs, eps, amp2;
+    float yn, yq, yn_1, yq_1, fw, pi, eps, amp2;
+    int SAMPLINGFREQ;
     
 };
 
@@ -163,6 +181,10 @@ class Env{
 public:
     Env(){};
     ~Env(){};
+    
+    void setSampleRate(int sf){
+        SAMPLINGFREQ = sf;
+    }
     
     void prepareToPlay(void){
         val = 0.0f;
@@ -187,6 +209,7 @@ public:
     
 private:
     float val, speed;
+    int SAMPLINGFREQ;
 };
 
 

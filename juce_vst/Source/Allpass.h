@@ -16,8 +16,8 @@ public:
 		return delay.read() - feedbackVal * feedback;
 	}
 
-	void prepareToPlay(void){
-		delay.prepareToPlay();
+	void prepareToPlay(int sampleRate){
+		delay.prepareToPlay(sampleRate);
 		feedback = 0.0f;
 	}
 

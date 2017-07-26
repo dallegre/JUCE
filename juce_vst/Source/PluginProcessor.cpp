@@ -111,17 +111,18 @@ void Juce_vstAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
 		oscAmtVal2Scaled = 50.0f * oscAmt2Val;				//amount in samples of modulation
 		oscFreqVal2Scaled = 5.0f * oscFreq2Val;				//frequency (roughly) of modulation
 		timeValScaled = 1.0f     * pow(timeVal, 0.5f);
-		dampValScaled = 16000.0f * pow(dampVal, 2.0f) / SAMPLINGFREQ;
+		dampValScaled = 16000.0f * pow(dampVal, 2.0f);
 
 		feedback[0] = 0.0f;
 		feedback[1] = 0.0f;
 
 		for (int i = 0; i < 2; i++) {
-			allpass[i].prepareToPlay();
-			allpass2[i].prepareToPlay();
-			allpass3[i].prepareToPlay();
-			allpass4[i].prepareToPlay();
-			damping[i].setFc(dampValScaled);
+			allpass[i].prepareToPlay(sampleRate);
+			allpass2[i].prepareToPlay(sampleRate);
+			allpass3[i].prepareToPlay(sampleRate);
+			allpass4[i].prepareToPlay(sampleRate);
+            damping[i].setSamplingFreq(sampleRate);
+            damping[i].setFc(dampValScaled);
 		}
 
 		donePrepareToPlay = 1;

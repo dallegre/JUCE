@@ -29,7 +29,7 @@ public:
 	}
 
 	//Put into preparetoplay..
-	void prepareToPlay(void) {
+	void prepareToPlay(int sampleRate) {
 
 		//initialize all variables
 		delayWriteIndex = 0;
@@ -46,7 +46,9 @@ public:
 		}
 
 		//filter for smoothing the delay time control
-		controlFilter.setFc(1.0f);
+        controlFilter.setSamplingFreq(sampleRate);
+        controlFilter.setFc(1.0f);
+        modOsc.setSamplingFreq(sampleRate);
 		modOsc.setF(0.1f, 100.0f);
 	}
 

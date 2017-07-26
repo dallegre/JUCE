@@ -109,8 +109,18 @@ void SynthAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 		driftSmoothing2.prepareForPlay();
 		freqSmoothing.prepareForPlay();
         modOsc.prepareForPlay();
+        
+        modOsc.setSampleRate(sampleRate);
+        ampSmoothing.setSampleRate(sampleRate);
+        driftSmoothing.setSampleRate(sampleRate);
+        driftSmoothing2.setSampleRate(sampleRate);
+        freqSmoothing.setSampleRate(sampleRate);
+        osc.setSampleRate(sampleRate);
+        osc2.setSampleRate(sampleRate);
+        filter.setSampleRate(sampleRate);
+        
+        
         modOsc.setF(0.1f,0.05f);
-
 		ampSmoothing.setFc2(200.0f);			//slow enough to avoid clicks, but fast enough to be snappy
 		driftSmoothing.setFc2(0.1f);			//want this to be pretty slow, mimick oscillator drift
 		driftSmoothing2.setFc2(0.1f);

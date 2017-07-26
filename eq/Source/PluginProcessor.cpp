@@ -108,8 +108,11 @@ void EqAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 		freq3ValScaled = 10000.0f * pow(freq3Val, 3.0f);
         for(int i = 0; i < 2; i++){
             filter1[i].prepareToPlay();
+            filter1[i].setSamplingFreq(sampleRate);
             filter2[i].prepareToPlay();
+            filter2[i].setSamplingFreq(sampleRate);
 			filter3[i].prepareToPlay();
+            filter3[i].setSamplingFreq(sampleRate);
             filter1[i].setFc(freq1ValScaled, amp1ValScaled, 6.0f);
             filter2[i].setFc(freq2ValScaled, amp2ValScaled, 6.0f);
 			filter3[i].setFc(freq3ValScaled, amp3ValScaled, 6.0f);

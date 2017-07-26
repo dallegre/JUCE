@@ -2,7 +2,7 @@
 
 //Taken from Will Pirkle's book.  Peaking is a non constant q peaking filter.
 
-#define SAMPLINGFREQ 44100
+//#define SAMPLINGFREQ 44100
 
 class Peaking{
 public:
@@ -24,6 +24,10 @@ public:
         wet  = 0.0f;
         op   = 0.0f;
         
+    }
+    
+    void setSamplingFreq(int sf){
+        SAMPLINGFREQ = sf;
     }
     
     void setFc(float freq, float amp, float Q){
@@ -51,8 +55,7 @@ public:
     
     float process(float ip){
         
-        wet = (a0 * ip) + (a2 * ip_2) - (b1 * op_1) - (b2 * op_2);          //op_1 has a problem.
-        //wet = (a0 * ip) + (a2 * ip_2) + (b2 * op_2);
+        wet = (a0 * ip) + (a2 * ip_2) - (b1 * op_1) - (b2 * op_2);
         
         op =  (d0 * ip) + (c0 * wet);
         
@@ -67,8 +70,7 @@ public:
     }
     
 private:
-    
     float fw, mu, beta, zeta, phi, a0, a1, a2, b1, b2, c0, d0, q, op;
     float ip_1, ip_2, op_1, op_2, wet;
-    
+    int SAMPLINGFREQ;
 };

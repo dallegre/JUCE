@@ -1,6 +1,5 @@
 #include <math.h>
 
-#define SAMPLINGFREQ 44100
 
 class OnePoleLp {
 
@@ -11,6 +10,10 @@ public:
     
     void prepareToPlay(void){
         a0 = 1.0f; b1 = 0.0f; z1 = 0.0f;
+    }
+    
+    void setSamplingFreq(int sf){
+        SAMPLINGFREQ = sf;
     }
 
 	void setFc(float Fc) {
@@ -26,6 +29,7 @@ public:
 private:
 	
 	float a0, b1, z1;
+    int SAMPLINGFREQ;
 
 };
 
@@ -39,13 +43,16 @@ public:
 		yq = 1;					//initial condition cos(0) = 1
 		yn_1 = 1, yq_1 = 0;     //hmm...
 		pi = 3.14159;
-		fs = SAMPLINGFREQ;
 	}
 
 	~gsOsc() {};
+    
+    void setSamplingFreq(int sf){
+        SAMPLINGFREQ = sf;
+    }
 
 	void setF(float frequency, float amp) {
-		fw = float(2.0)*pi*frequency / fs;
+		fw = float(2.0)*pi*frequency / SAMPLINGFREQ;
 		eps = float(2.0)*sin(fw / float(2.0));
 		amp2 = amp;
 	}
@@ -71,7 +78,8 @@ public:
 private:
 
 	//put variables here that you'll use within process
-	float yn, yq, yn_1, yq_1, fw, pi, fs, eps, amp2;
+	float yn, yq, yn_1, yq_1, fw, pi, eps, amp2;
+    int SAMPLINGFREQ;
 
 };
 
@@ -94,6 +102,10 @@ public:
 		bp_1 = 0.0f;
 		lp_1 = 0.0f;
 	}
+    
+    void setSamplingFreq(int sf){
+        SAMPLINGFREQ = sf;
+    }
 
 	void setFc(float fc){
 		f = 2.0f * sin(3.14159f * fc / SAMPLINGFREQ);
@@ -136,4 +148,6 @@ public:
 private:
 
 	float f, q, hp, bp, lp, bp_1, lp_1;
+    int SAMPLINGFREQ;
+    
 };
