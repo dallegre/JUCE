@@ -56,7 +56,7 @@ public:
 
                 paramSliders.add (aSlider = new Slider (param->name));
                 aSlider->setRange (param->range.start, param->range.end);
-                aSlider->setSliderStyle (Slider::LinearHorizontal);
+                aSlider->setSliderStyle (Slider::LinearBar);
                 aSlider->setValue (dynamic_cast<const AudioProcessorParameter*>(param)->getValue());
 
                 aSlider->addListener (this);
@@ -101,7 +101,7 @@ public:
 
     void paint (Graphics& g) override
     {
-        g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
+        g.fillAll (Colours::grey);
     }
 
     //==============================================================================
