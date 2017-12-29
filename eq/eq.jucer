@@ -9,7 +9,8 @@
               pluginChannelConfigs="" pluginIsSynth="0" pluginWantsMidiIn="0"
               pluginProducesMidiOut="0" pluginIsMidiEffectPlugin="0" pluginEditorRequiresKeys="0"
               pluginAUExportPrefix="eqAU" pluginRTASCategory="" aaxIdentifier="com.dan.eq"
-              pluginAAXCategory="AAX_ePlugInCategory_Dynamics" jucerVersion="5.0.2">
+              pluginAAXCategory="AAX_ePlugInCategory_Dynamics" jucerVersion="5.2.0"
+              cppLanguageStandard="11" companyCopyright="">
   <MAINGROUP id="F8z6Kz" name="eq">
     <GROUP id="{1738C606-4115-6551-4DEE-06A4CF1DADA1}" name="Source">
       <FILE id="pQbha0" name="PluginProcessor.cpp" compile="1" resource="0"
@@ -24,8 +25,8 @@
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX">
       <CONFIGURATIONS>
-        <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="eq"/>
-        <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="eq"/>
+        <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="eq" enablePluginBinaryCopyStep="1"/>
+        <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="eq" enablePluginBinaryCopyStep="1"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_core" path="../../../Downloads/JUCE/modules"/>
@@ -47,9 +48,11 @@
     <VS2015 targetFolder="Builds/VisualStudio2015">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
-                       isDebug="1" optimisation="1" targetName="eq"/>
+                       isDebug="1" optimisation="1" targetName="eq" debugInformationFormat="ProgramDatabase"
+                       enablePluginBinaryCopyStep="0"/>
         <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
-                       isDebug="0" optimisation="3" targetName="eq"/>
+                       isDebug="0" optimisation="3" targetName="eq" debugInformationFormat="ProgramDatabase"
+                       enablePluginBinaryCopyStep="0" linkTimeOptimisation="1"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_video" path="../../JUCE2/JUCE/modules"/>

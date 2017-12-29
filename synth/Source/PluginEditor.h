@@ -14,6 +14,7 @@
 #include "PluginProcessor.h"
 
 
+
 //==============================================================================
 /**
 */
@@ -31,17 +32,6 @@ private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     SynthAudioProcessor& processor;
-
-    Slider oscSlider;
-    Slider detSlider;
-	Slider ampSlider;
-    
-    Slider freqSlider;
-    Slider qSlider;
-    Slider envSlider;
-    Slider speedSlider;
-    
-    void sliderValueChanged(Slider* slider) override;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SynthAudioProcessorEditor)
 };

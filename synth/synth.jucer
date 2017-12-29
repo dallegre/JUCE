@@ -5,11 +5,12 @@
               bundleIdentifier="com.yourcompany.synth" includeBinaryInAppConfig="1"
               buildVST="1" buildVST3="0" buildAU="1" buildAUv3="0" buildRTAS="0"
               buildAAX="0" buildStandalone="0" enableIAA="0" pluginName="synth"
-              pluginDesc="synth" pluginManufacturer="yourcompany" pluginManufacturerCode="Manu"
+              pluginDesc="synth" pluginManufacturer="dan" pluginManufacturerCode="Manu"
               pluginCode="Nedm" pluginChannelConfigs="" pluginIsSynth="1" pluginWantsMidiIn="1"
               pluginProducesMidiOut="0" pluginIsMidiEffectPlugin="0" pluginEditorRequiresKeys="0"
-              pluginAUExportPrefix="synthAU" pluginRTASCategory="" aaxIdentifier="com.yourcompany.synth"
-              pluginAAXCategory="AAX_ePlugInCategory_Dynamics" jucerVersion="5.0.2">
+              pluginAUExportPrefix="synthAU" pluginRTASCategory="" aaxIdentifier="com.dan.synth"
+              pluginAAXCategory="AAX_ePlugInCategory_Dynamics" jucerVersion="5.2.0"
+              cppLanguageStandard="11" companyCopyright="">
   <MAINGROUP id="GhHEDE" name="synth">
     <GROUP id="{05294F68-8587-0155-64CA-2023D619F1D7}" name="Source">
       <FILE id="p5ytPy" name="PluginProcessor.cpp" compile="1" resource="0"
@@ -24,8 +25,10 @@
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX">
       <CONFIGURATIONS>
-        <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="synth"/>
-        <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="synth"/>
+        <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="synth"
+                       enablePluginBinaryCopyStep="1"/>
+        <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="synth"
+                       enablePluginBinaryCopyStep="1"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_core" path="../../../Downloads/JUCE/modules"/>
@@ -44,12 +47,14 @@
         <MODULEPATH id="juce_audio_plugin_client" path="../../../Downloads/JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
-    <VS2015 targetFolder="Builds/VisualStudio2015">
+    <VS2015 targetFolder="Builds/VisualStudio2015" windowsTargetPlatformVersion="8.1">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
-                       isDebug="1" optimisation="1" targetName="synth"/>
+                       isDebug="1" optimisation="1" targetName="synth" debugInformationFormat="ProgramDatabase"
+                       enablePluginBinaryCopyStep="0"/>
         <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
-                       isDebug="0" optimisation="3" targetName="synth"/>
+                       isDebug="0" optimisation="3" targetName="synth" debugInformationFormat="ProgramDatabase"
+                       enablePluginBinaryCopyStep="0" linkTimeOptimisation="1"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_video" path="..\..\JUCE2\JUCE\modules"/>

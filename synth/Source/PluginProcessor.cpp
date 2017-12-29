@@ -9,7 +9,7 @@
 */
 
 #include "PluginProcessor.h"
-#include "PluginEditor.h"
+#include "GenericEditor.h"
 #include <math.h>
 
 #define UPSAMPLING 64
@@ -27,10 +27,53 @@ SynthAudioProcessor::SynthAudioProcessor()
                        )
 #endif
 {
+	addParameter(oscP = new AudioParameterFloat("oscP", // parameter ID
+		"Tune", // parameter name
+		0.0f,   // mininum value
+		1.0f,   // maximum value
+		0.5f)); // default value
+
+	addParameter(detP = new AudioParameterFloat("detP", // parameter ID
+		"Detune", // parameter name
+		0.0f,   // mininum value
+		1.0f,   // maximum value
+		0.5f)); // default value
+
+	addParameter(ampP = new AudioParameterFloat("ampP", // parameter ID
+		"Amp", // parameter name
+		0.0f,   // mininum value
+		1.0f,   // maximum value
+		0.5f)); // default value
+
+	addParameter(freqP = new AudioParameterFloat("freqP", // parameter ID
+		"Freq", // parameter name
+		0.0f,   // mininum value
+		1.0f,   // maximum value
+		0.2f)); // default value
+
+	addParameter(qP = new AudioParameterFloat("qP", // parameter ID
+		"Q", // parameter name
+		0.0f,   // mininum value
+		1.0f,   // maximum value
+		0.5f)); // default value
+
+	addParameter(envP = new AudioParameterFloat("envP", // parameter ID
+		"Env", // parameter name
+		0.0f,   // mininum value
+		1.0f,   // maximum value
+		0.9f)); // default value
+
+	addParameter(speedP = new AudioParameterFloat("speedP", // parameter ID
+		"Decay", // parameter name
+		0.0f,   // mininum value
+		1.0f,   // maximum value
+		0.6f)); // default value
+
 }
 
 SynthAudioProcessor::~SynthAudioProcessor()
 {
+
 }
 
 //==============================================================================
@@ -126,20 +169,12 @@ void SynthAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 		driftSmoothing.setFc2(0.1f);			//want this to be pretty slow, mimick oscillator drift
 		driftSmoothing2.setFc2(0.1f);
 		freqSmoothing.setFc2(200.0f);
-
-        oscVal = 0.5f;
-        detVal = 0.5f;
-		ampVal = 0.5f;
-        freqVal = 0.2f;
-        qVal = 0.5f;
-        envVal = 0.9f;
-        speedVal = 0.6f;
         
-        freqValScaled = 20000.0f * pow(freqVal, 3.0f);
-        envValScaled =  10000.0f *  pow(envVal, 3.0f);
-        speedValScaled = pow((1.0f -  speedVal),2.0f);
-        oscValScaled =   (oscVal - 0.5f) * 70.0f;
-        detValScaled =   (detVal - 0.5f) * 7.0f;
+        freqValScaled = 20000.0f * pow(freqP->get(), 3.0f);
+        envValScaled =  10000.0f *  pow(envP->get(), 3.0f);
+        speedValScaled = pow((1.0f -  speedP->get()),2.0f);
+        oscValScaled =   (oscP->get() - 0.5f) * 70.0f;
+        detValScaled =   (detP->get() - 0.5f) * 7.0f;
         
         prepareToPlayDone = 1;
     
@@ -221,10 +256,17 @@ void SynthAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& m
         //just do the synth stuff on one channel.
         if(channel == 0){
             for(int sample = 0; sample < buffer.getNumSamples(); ++sample){
+
+				//do this stuff here.  it's terribly inefficient..
+				freqValScaled = 20000.0f * pow(freqP->get(), 3.0f);
+				envValScaled = 10000.0f *  pow(envP->get(), 3.0f);
+				speedValScaled = pow((1.0f - speedP->get()), 2.0f);
+				oscValScaled = (oscP->get() - 0.5f) * 70.0f;
+				detValScaled = (detP->get() - 0.5f) * 7.0f;
                 
                 filter.setFc(freqSmoothing.process(freqValScaled + (envValScaled * pow(env.process(),3.0f))) / UPSAMPLING);
                 env.setSpeed(speedValScaled);
-                filter.setQ(qVal);
+                filter.setQ(qP->get());
 				float frequency = noteVal + 24.0f + oscValScaled + modOsc.process(0) + (driftSmoothing.process((random.nextFloat() * 0.5f) - 0.25f) * 20.0f);
                 float frequency2 = exp((frequency + detValScaled + (driftSmoothing2.process(random.nextFloat() * 0.5f - 0.25f) * 20.0f)) / 17.31f) / UPSAMPLING;
 				frequency = exp(frequency / 17.31f) / UPSAMPLING;
@@ -235,7 +277,7 @@ void SynthAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& m
                 float data;
                 
                 for(int i = 0; i < UPSAMPLING; i++){
-                    data = 20.0f * filter.process(0.1f * osc.process() + ampVal * 0.1f * osc2.process());
+                    data = 20.0f * filter.process(0.1f * osc.process() + ampP->get() * 0.1f * osc2.process());
                 }
                 
                 data *= monoNoteOn2;
@@ -255,7 +297,8 @@ bool SynthAudioProcessor::hasEditor() const
 
 AudioProcessorEditor* SynthAudioProcessor::createEditor()
 {
-    return new SynthAudioProcessorEditor (*this);
+    //return new SynthAudioProcessorEditor (*this);
+	return new GenericEditor(*this);
 }
 
 //==============================================================================
@@ -264,12 +307,37 @@ void SynthAudioProcessor::getStateInformation (MemoryBlock& destData)
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
+	MemoryOutputStream oStream(destData, true);
+	oStream.writeFloat(*oscP);
+	oStream.writeFloat(*detP);
+	oStream.writeFloat(*ampP);
+	oStream.writeFloat(*freqP);
+	oStream.writeFloat(*qP);
+	oStream.writeFloat(*envP);
+	oStream.writeFloat(*speedP);
+
+	//MemoryOutputStream(destData, true).writeFloat(*speedP);
+
 }
 
 void SynthAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+
+	MemoryInputStream iStream(data, static_cast<size_t> (sizeInBytes), false);
+	*oscP = iStream.readFloat();
+	*detP = iStream.readFloat();
+	*ampP = iStream.readFloat();
+	*freqP = iStream.readFloat();
+	*qP = iStream.readFloat();
+	*envP = iStream.readFloat();
+	*speedP = iStream.readFloat();
+
+	//*oscP =   MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat();
+
+	//*speedP = MemoryInputStream(data, static_cast<size_t> (sizeInBytes), false).readFloat();
+
 }
 
 //==============================================================================

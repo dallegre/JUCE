@@ -9,8 +9,8 @@
               pluginCode="Miju" pluginChannelConfigs="" pluginIsSynth="0" pluginWantsMidiIn="0"
               pluginProducesMidiOut="0" pluginIsMidiEffectPlugin="0" pluginEditorRequiresKeys="0"
               pluginAUExportPrefix="filterdelayAU" pluginRTASCategory="" aaxIdentifier="com.dan.filterdelay"
-              pluginAAXCategory="AAX_ePlugInCategory_Dynamics" jucerVersion="5.0.2"
-              companyName="dan">
+              pluginAAXCategory="AAX_ePlugInCategory_Dynamics" jucerVersion="5.2.0"
+              companyName="dan" cppLanguageStandard="11" companyCopyright="dan">
   <MAINGROUP id="KqXb3H" name="filterdelay">
     <GROUP id="{FD6C660B-3679-5B28-85DF-FDB42DDAC18C}" name="Source">
       <FILE id="F9TF5I" name="PluginProcessor.cpp" compile="1" resource="0"
@@ -26,9 +26,11 @@
     <VS2015 targetFolder="Builds/VisualStudio2015">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
-                       isDebug="1" optimisation="1" targetName="juce_vst2"/>
+                       isDebug="1" optimisation="1" targetName="juce_vst2" debugInformationFormat="ProgramDatabase"
+                       enablePluginBinaryCopyStep="0"/>
         <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
-                       isDebug="0" optimisation="3" targetName="juce_vst2"/>
+                       isDebug="0" optimisation="3" targetName="juce_vst2" debugInformationFormat="ProgramDatabase"
+                       enablePluginBinaryCopyStep="0" linkTimeOptimisation="1"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_core" path="../../JUCE2/JUCE/modules"/>
@@ -69,8 +71,10 @@
     </LINUX_MAKE>
     <XCODE_MAC targetFolder="Builds/MacOSX">
       <CONFIGURATIONS>
-        <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="filterdelay"/>
-        <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="filterdelay"/>
+        <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="filterdelay"
+                       enablePluginBinaryCopyStep="1"/>
+        <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="filterdelay"
+                       enablePluginBinaryCopyStep="1"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_opengl" path="../../../Downloads/JUCE/modules"/>
