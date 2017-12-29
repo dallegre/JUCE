@@ -60,22 +60,10 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
 	//variable to handle the volume control.  Not sure about making it public
-	float filterFreqVal;
-	float filterQVal;
-
-	float filter2FreqVal;
-	float filter2QVal;
-
-	float dryVal;
-	float wetVal;
-	float feedbackVal;
-	float delayVal;
-	float oscAmtVal;
-	float oscFreqVal;
 
 	float filterFreqScaled, filter2FreqScaled, oscAmtValScaled, oscFreqValScaled;
 
-	int prepareToPlayDone = 0;
+	int prepareToPlayDone;
 
 	stateVariable svfilter[2], svfilter2[2];
 
@@ -87,6 +75,19 @@ private:
     gsOsc modOsc;
 	float prevSample[2], data, data2, upSamples[UPSAMPLING];
 	OnePoleLp freqSmoothing, fcSmoothing, fc2Smoothing;
+
+	AudioParameterFloat* freq1P;
+	AudioParameterFloat* q1P;
+
+	AudioParameterFloat* freq2P;
+	AudioParameterFloat* q2P;
+
+	AudioParameterFloat* dryP;
+	AudioParameterFloat* wetP;
+	AudioParameterFloat* fbP;
+	AudioParameterFloat* delP;
+	AudioParameterFloat* mamtP;
+	AudioParameterFloat* mfreqP;
 
     //==============================================================================
 	

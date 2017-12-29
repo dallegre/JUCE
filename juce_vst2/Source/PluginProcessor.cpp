@@ -9,7 +9,7 @@
 */
 
 #include "PluginProcessor.h"
-#include "PluginEditor.h"
+#include "GenericEditor.h"
 
 
 //==============================================================================
@@ -25,6 +25,62 @@ Juce_vst2AudioProcessor::Juce_vst2AudioProcessor()
                        )
 #endif
 {
+
+	prepareToPlayDone = 0;
+
+	addParameter(freq1P = new AudioParameterFloat("freq1P", // parameter ID
+		"HPfreq", // parameter name
+		0.0f,   // mininum value
+		1.0f,   // maximum value
+		0.0f)); // default value
+	addParameter(q1P = new AudioParameterFloat("q1P", // parameter ID
+		"HPQ", // parameter name
+		0.0f,   // mininum value
+		1.0f,   // maximum value
+		0.2f)); // default value
+
+	addParameter(freq2P = new AudioParameterFloat("freq2P", // parameter ID
+		"LPfreq", // parameter name
+		0.0f,   // mininum value
+		1.0f,   // maximum value
+		1.0f)); // default value
+	addParameter(q2P = new AudioParameterFloat("q2P", // parameter ID
+		"LPQ", // parameter name
+		0.0f,   // mininum value
+		1.0f,   // maximum value
+		0.2f)); // default value
+
+	addParameter(dryP = new AudioParameterFloat("dryP", // parameter ID
+		"Dry", // parameter name
+		0.0f,   // mininum value
+		1.0f,   // maximum value
+		1.0f)); // default value
+	addParameter(wetP = new AudioParameterFloat("wetP", // parameter ID
+		"Wet", // parameter name
+		0.0f,   // mininum value
+		1.0f,   // maximum value
+		0.0f)); // default value
+	addParameter(delP = new AudioParameterFloat("delP", // parameter ID
+		"Delay", // parameter name
+		0.0f,   // mininum value
+		1.0f,   // maximum value
+		0.5f)); // default value
+	addParameter(fbP = new AudioParameterFloat("fbP", // parameter ID
+		"Feedback", // parameter name
+		0.0f,   // mininum value
+		1.0f,   // maximum value
+		0.5f)); // default value
+	addParameter(mamtP = new AudioParameterFloat("mamtP", // parameter ID
+		"Mod Amount", // parameter name
+		0.0f,   // mininum value
+		1.0f,   // maximum value
+		0.7f)); // default value
+	addParameter(mfreqP = new AudioParameterFloat("mfreqP", // parameter ID
+		"Mod Freq", // parameter name
+		0.0f,   // mininum value
+		1.0f,   // maximum value
+		0.3f)); // default value
+
 }
 
 Juce_vst2AudioProcessor::~Juce_vst2AudioProcessor()
@@ -90,26 +146,9 @@ void Juce_vst2AudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
 	if (!prepareToPlayDone) {
-		
-		filterFreqVal =  0.0f;
-		filterQVal =     0.2f;
-
-		filter2FreqVal = 1.0f;
-		filter2QVal =    0.2f;
         
-        filterFreqScaled =  0.0f;
-        filter2FreqScaled = 20000.0f;
-
-		dryVal =      1.0f;
-		wetVal =      0.0f;
-		feedbackVal = 0.5f;
-		delayVal =    0.5f;
-		oscAmtVal =   0.7f;
-		oscFreqVal =  0.3f;
-        
-        
-        oscAmtValScaled =  50.0f   * oscAmtVal;
-        oscFreqValScaled = 2.0f *    oscFreqVal;
+        oscAmtValScaled =  50.0f   * mamtP->get();
+        oscFreqValScaled = 2.0f *    mfreqP->get();
 
 		for (int i = 0; i < 2; i++) {
 			delay[i].prepareToPlay(sampleRate);
@@ -189,6 +228,19 @@ void Juce_vst2AudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffe
 	// audio processing...
 	for (int channel = 0; channel < totalNumInputChannels; ++channel)
 	{
+
+		//again put this in a very inefficient place...
+		filterFreqScaled = 10000.0f *  pow(freq1P->get(), 3.0);
+		filter2FreqScaled = 20000.0f *  pow(freq2P->get(), 3.0);
+
+		oscAmtValScaled = 50.0f * mamtP->get();
+		oscFreqValScaled = 2.0f * mfreqP->get();
+
+		svfilter[channel].setFc(filterFreqScaled, UPSAMPLING);
+		svfilter[channel].setQ(q1P->get());
+		svfilter2[channel].setFc(filter2FreqScaled, UPSAMPLING);
+		svfilter2[channel].setQ(q2P->get());
+
 		// ..do something to the data...
 		for (int sample = 0; sample < buffer.getNumSamples(); ++sample) {
 
@@ -212,9 +264,9 @@ void Juce_vst2AudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffe
 			}
 
 			//apply a delay
-			delay[channel].updateIndex(delayVal, oscAmtValScaled, oscFreqValScaled, channel);
-			delay[channel].write((data2 + feedbackVal * delay[channel].read()));
-			data2 = dryVal * data2 + wetVal * delay[channel].read();
+			delay[channel].updateIndex(delP->get(), oscAmtValScaled, oscFreqValScaled, channel);
+			delay[channel].write((data2 + fbP->get() * delay[channel].read()));
+			data2 = dryP->get() * data2 + wetP->get() * delay[channel].read();
 
 			data2 = data2 * 100.0f;
 
@@ -234,7 +286,7 @@ bool Juce_vst2AudioProcessor::hasEditor() const
 
 AudioProcessorEditor* Juce_vst2AudioProcessor::createEditor()
 {
-    return new Juce_vst2AudioProcessorEditor (*this);
+	return new GenericEditor(*this);
 }
 
 //==============================================================================
@@ -243,12 +295,37 @@ void Juce_vst2AudioProcessor::getStateInformation (MemoryBlock& destData)
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
+	MemoryOutputStream oStream(destData, true);
+	oStream.writeFloat(*freq1P);
+	oStream.writeFloat(*q1P);
+	oStream.writeFloat(*freq2P);
+	oStream.writeFloat(*q2P);
+	oStream.writeFloat(*wetP);
+	oStream.writeFloat(*dryP);
+	oStream.writeFloat(*delP);
+	oStream.writeFloat(*fbP);
+	oStream.writeFloat(*mamtP);
+	oStream.writeFloat(*mfreqP);
+
+
 }
 
 void Juce_vst2AudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+	MemoryInputStream iStream(data, static_cast<size_t> (sizeInBytes), false);
+	*freq1P = iStream.readFloat();
+	*q1P =    iStream.readFloat();
+	*freq2P = iStream.readFloat();
+	*q2P =    iStream.readFloat();
+	*wetP =   iStream.readFloat();
+	*dryP =   iStream.readFloat();
+	*delP =   iStream.readFloat();
+	*fbP =    iStream.readFloat();
+	*mamtP =  iStream.readFloat();
+	*mfreqP = iStream.readFloat();
+
 }
 
 //==============================================================================
