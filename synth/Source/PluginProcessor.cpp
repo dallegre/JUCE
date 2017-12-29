@@ -255,14 +255,15 @@ void SynthAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& m
         
         //just do the synth stuff on one channel.
         if(channel == 0){
-            for(int sample = 0; sample < buffer.getNumSamples(); ++sample){
 
-				//do this stuff here.  it's terribly inefficient..
-				freqValScaled = 20000.0f * pow(freqP->get(), 3.0f);
-				envValScaled = 10000.0f *  pow(envP->get(), 3.0f);
-				speedValScaled = pow((1.0f - speedP->get()), 2.0f);
-				oscValScaled = (oscP->get() - 0.5f) * 70.0f;
-				detValScaled = (detP->get() - 0.5f) * 7.0f;
+			//do this stuff here.  it's terribly inefficient..
+			freqValScaled = 20000.0f * pow(freqP->get(), 3.0f);
+			envValScaled = 10000.0f *  pow(envP->get(), 3.0f);
+			speedValScaled = pow((1.0f - speedP->get()), 2.0f);
+			oscValScaled = (oscP->get() - 0.5f) * 70.0f;
+			detValScaled = (detP->get() - 0.5f) * 7.0f; 
+
+            for(int sample = 0; sample < buffer.getNumSamples(); ++sample){
                 
                 filter.setFc(freqSmoothing.process(freqValScaled + (envValScaled * pow(env.process(),3.0f))) / UPSAMPLING);
                 env.setSpeed(speedValScaled);
