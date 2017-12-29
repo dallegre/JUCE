@@ -9,7 +9,8 @@
               pluginCode="Mgwz" pluginChannelConfigs="" pluginIsSynth="0" pluginWantsMidiIn="0"
               pluginProducesMidiOut="0" pluginIsMidiEffectPlugin="0" pluginEditorRequiresKeys="0"
               pluginAUExportPrefix="reverbAU" pluginRTASCategory="" aaxIdentifier="com.dan.reverb"
-              pluginAAXCategory="AAX_ePlugInCategory_Dynamics" jucerVersion="5.0.2">
+              pluginAAXCategory="AAX_ePlugInCategory_Dynamics" jucerVersion="5.2.0"
+              cppLanguageStandard="11" companyCopyright="">
   <MAINGROUP id="fYnHVH" name="reverb">
     <GROUP id="{0F3D635E-6E2B-9C40-AD88-E2CC0FCDF114}" name="Source">
       <FILE id="RnsrCI" name="PluginProcessor.cpp" compile="1" resource="0"
@@ -25,9 +26,11 @@
     <VS2015 targetFolder="Builds/VisualStudio2015">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
-                       isDebug="1" optimisation="1" targetName="juce_vst"/>
+                       isDebug="1" optimisation="1" targetName="juce_vst" debugInformationFormat="ProgramDatabase"
+                       enablePluginBinaryCopyStep="0"/>
         <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
-                       isDebug="0" optimisation="3" targetName="juce_vst"/>
+                       isDebug="0" optimisation="3" targetName="juce_vst" debugInformationFormat="ProgramDatabase"
+                       enablePluginBinaryCopyStep="0" linkTimeOptimisation="1"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_core" path="../../JUCE2/JUCE/modules"/>
@@ -68,8 +71,10 @@
     </LINUX_MAKE>
     <XCODE_MAC targetFolder="Builds/MacOSX">
       <CONFIGURATIONS>
-        <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="reverb"/>
-        <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="reverb"/>
+        <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="reverb"
+                       enablePluginBinaryCopyStep="1"/>
+        <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="reverb"
+                       enablePluginBinaryCopyStep="1"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_opengl" path="../../../Downloads/JUCE/modules"/>

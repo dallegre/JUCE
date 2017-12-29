@@ -9,7 +9,7 @@
 */
 
 #include "PluginProcessor.h"
-#include "PluginEditor.h"
+#include "GenericEditor.h"
 
 #include <math.h>
 
@@ -27,6 +27,61 @@ EqAudioProcessor::EqAudioProcessor()
                        )
 #endif
 {
+
+	addParameter(amp1P = new AudioParameterFloat("amp1P", // parameter ID
+		"Amp", // parameter name
+		0.0f,   // mininum value
+		1.0f,   // maximum value
+		0.5f)); // default value
+	addParameter(q1P = new AudioParameterFloat("q1P", // parameter ID
+		"Q", // parameter name
+		0.0f,   // mininum value
+		1.0f,   // maximum value
+		0.5f)); // default value
+	addParameter(freq1P = new AudioParameterFloat("freq	1P", // parameter ID
+		"Freq", // parameter name
+		0.0f,   // mininum value
+		1.0f,   // maximum value
+		0.2f)); // default value
+
+	addParameter(amp2P = new AudioParameterFloat("amp2P", // parameter ID
+		"Amp", // parameter name
+		0.0f,   // mininum value
+		1.0f,   // maximum value
+		0.5f)); // default value
+	addParameter(q2P = new AudioParameterFloat("q2P", // parameter ID
+		"Q", // parameter name
+		0.0f,   // mininum value
+		1.0f,   // maximum value
+		0.5f)); // default value
+	addParameter(freq2P = new AudioParameterFloat("freq2P", // parameter ID
+		"Freq", // parameter name
+		0.0f,   // mininum value
+		1.0f,   // maximum value
+		0.5f)); // default value
+
+	addParameter(amp3P = new AudioParameterFloat("amp3P", // parameter ID
+		"Amp", // parameter name
+		0.0f,   // mininum value
+		1.0f,   // maximum value
+		0.5f)); // default value
+	addParameter(q3P = new AudioParameterFloat("q3P", // parameter ID
+		"Q", // parameter name
+		0.0f,   // mininum value
+		1.0f,   // maximum value
+		0.5f)); // default value
+	addParameter(freq3P = new AudioParameterFloat("freq3P", // parameter ID
+		"Freq", // parameter name
+		0.0f,   // mininum value
+		1.0f,   // maximum value
+		0.8f)); // default value
+
+	addParameter(gainP = new AudioParameterFloat("gainP", // parameter ID
+		"Gain", // parameter name
+		0.0f,   // mininum value
+		1.0f,   // maximum value
+		0.5f)); // default value
+
 }
 
 EqAudioProcessor::~EqAudioProcessor()
@@ -90,22 +145,13 @@ void EqAudioProcessor::changeProgramName (int index, const String& newName)
 void EqAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     if(!prepareToPlayDone){
-        amp1Val = 0.5f;
-        amp2Val = 0.5f;
-		amp3Val = 0.5f;
-        freq1Val = 0.2f;
-        freq2Val = 0.5f;
-		freq3Val = 0.8f;
-		q1Val = 0.5f;
-		q2Val = 0.5f;
-		q3Val = 0.5f;
-		gainVal = 1.0f;
-        amp1ValScaled  = (amp1Val - 0.5f);
-        amp2ValScaled  = (amp2Val - 0.5f);
-		amp3ValScaled =  (amp3Val - 0.5f);
-        freq1ValScaled = 10000.0f * pow(freq1Val, 3.0f);
-        freq2ValScaled = 10000.0f * pow(freq2Val, 3.0f);
-		freq3ValScaled = 10000.0f * pow(freq3Val, 3.0f);
+
+        amp1ValScaled  = (amp1P->get() - 0.5f);
+        amp2ValScaled  = (amp2P->get() - 0.5f);
+		amp3ValScaled =  (amp3P->get() - 0.5f);
+        freq1ValScaled = 10000.0f * pow(freq1P->get(), 3.0f);
+        freq2ValScaled = 10000.0f * pow(freq2P->get(), 3.0f);
+		freq3ValScaled = 10000.0f * pow(freq3P->get(), 3.0f);
         for(int i = 0; i < 2; i++){
             filter1[i].prepareToPlay();
             filter1[i].setSamplingFreq(sampleRate);
@@ -113,9 +159,9 @@ void EqAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
             filter2[i].setSamplingFreq(sampleRate);
 			filter3[i].prepareToPlay();
             filter3[i].setSamplingFreq(sampleRate);
-            filter1[i].setFc(freq1ValScaled, amp1ValScaled, 6.0f);
-            filter2[i].setFc(freq2ValScaled, amp2ValScaled, 6.0f);
-			filter3[i].setFc(freq3ValScaled, amp3ValScaled, 6.0f);
+            filter1[i].setFc(freq1ValScaled, amp1ValScaled, q1P->get());
+            filter2[i].setFc(freq2ValScaled, amp2ValScaled, q2P->get());
+			filter3[i].setFc(freq3ValScaled, amp3ValScaled, q3P->get());
         }
         prepareToPlayDone = 1;
     }
@@ -169,12 +215,23 @@ void EqAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     // audio processing...
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
+		//try to find a more efficient way to do this.
+		amp1ValScaled = (amp1P->get() - 0.5f);
+		amp2ValScaled = (amp2P->get() - 0.5f);
+		amp3ValScaled = (amp3P->get() - 0.5f);
+		freq1ValScaled = 10000.0f * pow(freq1P->get(), 3.0f);
+		freq2ValScaled = 10000.0f * pow(freq2P->get(), 3.0f);
+		freq3ValScaled = 10000.0f * pow(freq3P->get(), 3.0f);
+		filter1[channel].setFc(freq1ValScaled, amp1ValScaled, q1P->get());
+		filter2[channel].setFc(freq2ValScaled, amp2ValScaled, q2P->get());
+		filter3[channel].setFc(freq3ValScaled, amp3ValScaled, q3P->get());
+
 		for (int sample = 0; sample < buffer.getNumSamples(); ++sample) {
             data = buffer.getSample(channel, sample);
             data = filter1[channel].process(data);
             data = filter2[channel].process(data);
 			data = filter3[channel].process(data);
-			data *= gainVal;
+			data *= gainP->get();
 			buffer.setSample(channel, sample, data);
         }
     }
@@ -188,7 +245,7 @@ bool EqAudioProcessor::hasEditor() const
 
 AudioProcessorEditor* EqAudioProcessor::createEditor()
 {
-    return new EqAudioProcessorEditor (*this);
+	return new GenericEditor(*this);
 }
 
 //==============================================================================
@@ -197,12 +254,34 @@ void EqAudioProcessor::getStateInformation (MemoryBlock& destData)
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
+	MemoryOutputStream oStream(destData, true);
+	oStream.writeFloat(*amp1P);
+	oStream.writeFloat(*q1P);
+	oStream.writeFloat(*freq1P);
+	oStream.writeFloat(*amp2P);
+	oStream.writeFloat(*q2P);
+	oStream.writeFloat(*freq2P);
+	oStream.writeFloat(*amp3P);
+	oStream.writeFloat(*q3P);
+	oStream.writeFloat(*freq3P);
+	oStream.writeFloat(*gainP);
 }
 
 void EqAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+	MemoryInputStream iStream(data, static_cast<size_t> (sizeInBytes), false);
+	*amp1P =  iStream.readFloat();
+	*q1P =    iStream.readFloat();
+	*freq1P = iStream.readFloat();
+	*amp2P =  iStream.readFloat();
+	*q2P =    iStream.readFloat();
+	*freq2P = iStream.readFloat();
+	*amp3P =  iStream.readFloat();
+	*q3P =    iStream.readFloat();
+	*freq3P = iStream.readFloat();
+	*gainP =  iStream.readFloat();
 }
 
 //==============================================================================

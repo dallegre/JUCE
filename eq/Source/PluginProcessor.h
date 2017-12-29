@@ -57,16 +57,25 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
     
-    float amp1Val, amp2Val, amp3Val, 
-		freq1Val, freq2Val, freq3Val, 
-		amp1ValScaled, amp2ValScaled, amp3ValScaled,
+    float amp1ValScaled, amp2ValScaled, amp3ValScaled,
 		freq1ValScaled, freq2ValScaled, freq3ValScaled, 
-		q1Val, q2Val, q3Val, 
-		data, gainVal;
+		data;
     Peaking filter1[2], filter2[2], filter3[2];
     int prepareToPlayDone = 0;
 
 private:
+
+	AudioParameterFloat* amp1P;
+	AudioParameterFloat* amp2P;
+	AudioParameterFloat* amp3P;
+	AudioParameterFloat* q1P;
+	AudioParameterFloat* q2P;
+	AudioParameterFloat* q3P;
+	AudioParameterFloat* freq1P;
+	AudioParameterFloat* freq2P;
+	AudioParameterFloat* freq3P;
+	AudioParameterFloat* gainP;
+
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EqAudioProcessor)
 };
