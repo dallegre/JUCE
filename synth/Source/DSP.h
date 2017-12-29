@@ -73,7 +73,7 @@ public:
     
     float process(float input){
         z1 = (input - q*feedback)*a0 + z1*b1;
-		z1 = tanh(z1);
+		z1 = tanh(z1*2.0f)/2.0f;
         //z2 = z1*(1 - (b1 * 1.00002)) + z2*(b1 * 1.00002);
 		z2 = z1*a0 + z2*b1;
 		//z2 = tanh(z2);

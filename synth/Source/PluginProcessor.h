@@ -61,7 +61,7 @@ public:
     
 private:
     
-    int noteOn, prepareToPlayDone = 0;
+    int noteOn, prepareToPlayDone;
     float monoNoteOn, noteVal;
     Osc osc, osc2;
     gsOsc modOsc;

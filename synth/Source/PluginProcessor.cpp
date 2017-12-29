@@ -27,6 +27,9 @@ SynthAudioProcessor::SynthAudioProcessor()
                        )
 #endif
 {
+
+	prepareToPlayDone = 0;
+
 	addParameter(oscP = new AudioParameterFloat("oscP", // parameter ID
 		"Tune", // parameter name
 		0.0f,   // mininum value
@@ -256,20 +259,21 @@ void SynthAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& m
         //just do the synth stuff on one channel.
         if(channel == 0){
 
-			//do this stuff here.  it's terribly inefficient..
-			freqValScaled = 20000.0f * pow(freqP->get(), 3.0f);
-			envValScaled = 10000.0f *  pow(envP->get(), 3.0f);
-			speedValScaled = pow((1.0f - speedP->get()), 2.0f);
-			oscValScaled = (oscP->get() - 0.5f) * 70.0f;
-			detValScaled = (detP->get() - 0.5f) * 7.0f; 
 
             for(int sample = 0; sample < buffer.getNumSamples(); ++sample){
-                
+  
+				//do this stuff here.  it's terribly inefficient..
+				freqValScaled = 20000.0f * pow(freqP->get(), 3.0f);
+				envValScaled = 10000.0f *  pow(envP->get(), 3.0f);
+				speedValScaled = pow((1.0f - speedP->get()), 2.0f);
+				oscValScaled = (oscP->get() - 0.5f) * 70.0f;
+				detValScaled = (detP->get() - 0.5f) * 24.0f;
+
                 filter.setFc(freqSmoothing.process(freqValScaled + (envValScaled * pow(env.process(),3.0f))) / UPSAMPLING);
                 env.setSpeed(speedValScaled);
                 filter.setQ(qP->get());
-				float frequency = noteVal + 24.0f + oscValScaled + modOsc.process(0) + (driftSmoothing.process((random.nextFloat() * 0.5f) - 0.25f) * 20.0f);
-                float frequency2 = exp((frequency + detValScaled + (driftSmoothing2.process(random.nextFloat() * 0.5f - 0.25f) * 20.0f)) / 17.31f) / UPSAMPLING;
+				float frequency = noteVal + 24.0f + oscValScaled + modOsc.process(0) + (driftSmoothing.process(random.nextFloat() - 0.5f) * 20.0f);
+                float frequency2 = exp((frequency + detValScaled + (driftSmoothing2.process(random.nextFloat() - 0.5f) * 10.0f)) / 17.31f) / UPSAMPLING;
 				frequency = exp(frequency / 17.31f) / UPSAMPLING;
 				osc.setF(frequency);
                 osc2.setF(frequency2);
