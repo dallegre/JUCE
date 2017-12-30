@@ -29,73 +29,74 @@ Juce_vstAudioProcessorEditor::Juce_vstAudioProcessorEditor (Juce_vstAudioProcess
 	drySlider.setSliderStyle(Slider::LinearBarVertical);
 	drySlider.setRange(0.0, 1.0, 0.01);
 	drySlider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
-	drySlider.setPopupDisplayEnabled(true, this);
+	//these methods don't work on Mac, only Windows...
+    //drySlider.setPopupDisplayEnabled(true, this);
 	drySlider.setTextValueSuffix(" Dry");
 
 	wetSlider.setSliderStyle(Slider::LinearBarVertical);
 	wetSlider.setRange(0.0, 1.0, 0.01);
 	wetSlider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
-	wetSlider.setPopupDisplayEnabled(true, this);
+	//wetSlider.setPopupDisplayEnabled(true, this);
 	wetSlider.setTextValueSuffix(" Wet");
 
 	timeSlider.setSliderStyle(Slider::LinearBarVertical);
 	timeSlider.setRange(0.0, 1.0, 0.01);
 	timeSlider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
-	timeSlider.setPopupDisplayEnabled(true, this);
+	//timeSlider.setPopupDisplayEnabled(true, this);
 	timeSlider.setTextValueSuffix(" Dec");
 
 	dampSlider.setSliderStyle(Slider::LinearBarVertical);
 	dampSlider.setRange(0.0, 1.0, 0.01);
 	dampSlider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
-	dampSlider.setPopupDisplayEnabled(true, this);
+	//dampSlider.setPopupDisplayEnabled(true, this);
 	dampSlider.setTextValueSuffix(" Damp");
 
 	feedbackSlider.setSliderStyle(Slider::LinearBarVertical);
 	feedbackSlider.setRange(0.0, 1.0, 0.01);
 	feedbackSlider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
-	feedbackSlider.setPopupDisplayEnabled(true, this);
+	//feedbackSlider.setPopupDisplayEnabled(true, this);
 	feedbackSlider.setTextValueSuffix(" Feedback");
 
 	delaySlider.setSliderStyle(Slider::LinearBarVertical);
 	delaySlider.setRange(0.0, 1.0, 0.01);
 	delaySlider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
-	delaySlider.setPopupDisplayEnabled(true, this);
+	//delaySlider.setPopupDisplayEnabled(true, this);
 	delaySlider.setTextValueSuffix(" Delay");
 
 	oscAmtSlider.setSliderStyle(Slider::LinearBarVertical);
 	oscAmtSlider.setRange(0.0, 1.0, 0.01);
 	oscAmtSlider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
-	oscAmtSlider.setPopupDisplayEnabled(true, this);
+	//oscAmtSlider.setPopupDisplayEnabled(true, this);
 	oscAmtSlider.setTextValueSuffix(" Modulation");
 
 	oscFreqSlider.setSliderStyle(Slider::LinearBarVertical);
 	oscFreqSlider.setRange(0.0, 1.0, 0.01);
 	oscFreqSlider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
-	oscFreqSlider.setPopupDisplayEnabled(true, this);
+	//oscFreqSlider.setPopupDisplayEnabled(true, this);
 	oscFreqSlider.setTextValueSuffix(" Frequency");
 
 	feedback2Slider.setSliderStyle(Slider::LinearBarVertical);
 	feedback2Slider.setRange(0.0, 1.0, 0.01);
 	feedback2Slider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
-	feedback2Slider.setPopupDisplayEnabled(true, this);
+	//feedback2Slider.setPopupDisplayEnabled(true, this);
 	feedback2Slider.setTextValueSuffix(" Feedback");
 
 	delay2Slider.setSliderStyle(Slider::LinearBarVertical);
 	delay2Slider.setRange(0.0, 1.0, 0.01);
 	delay2Slider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
-	delay2Slider.setPopupDisplayEnabled(true, this);
+	//delay2Slider.setPopupDisplayEnabled(true, this);
 	delay2Slider.setTextValueSuffix(" Delay");
 
 	oscAmt2Slider.setSliderStyle(Slider::LinearBarVertical);
 	oscAmt2Slider.setRange(0.0, 1.0, 0.01);
 	oscAmt2Slider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
-	oscAmt2Slider.setPopupDisplayEnabled(true, this);
+	//oscAmt2Slider.setPopupDisplayEnabled(true, this);
 	oscAmt2Slider.setTextValueSuffix(" Modulation");
 
 	oscFreq2Slider.setSliderStyle(Slider::LinearBarVertical);
 	oscFreq2Slider.setRange(0.0, 1.0, 0.01);
 	oscFreq2Slider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
-	oscFreq2Slider.setPopupDisplayEnabled(true, this);
+	//oscFreq2Slider.setPopupDisplayEnabled(true, this);
 	oscFreq2Slider.setTextValueSuffix(" Frequency");
 
 	//add the slider to the editor

@@ -275,8 +275,8 @@ void Juce_vstAudioProcessor::getStateInformation (MemoryBlock& destData)
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
 	MemoryOutputStream oStream(destData, true);
-	oStream.writeFloat(*wetP);
 	oStream.writeFloat(*dryP);
+	oStream.writeFloat(*wetP);
 	oStream.writeFloat(*timeP);
 	oStream.writeFloat(*dampP);
 }

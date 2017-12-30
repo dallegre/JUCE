@@ -145,7 +145,8 @@ public:
     void prepareForPlay(void){
         yn = 0;					//initial condition sine(0) = 0
         yq = 1;					//initial condition cos(0) = 1
-        yn_1 = 1, yq_1 = 0;     //hmm...
+        yn_1 = 1;
+        yq_1 = 0;     //hmm...
         pi = 3.14159;
     }
     

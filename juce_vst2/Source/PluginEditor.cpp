@@ -26,14 +26,14 @@ Juce_vst2AudioProcessorEditor::Juce_vst2AudioProcessorEditor (Juce_vst2AudioProc
 	filterFreqSlider.setSliderStyle(Slider::LinearBarVertical);
 	filterFreqSlider.setRange(0.0, 1.0, 0.001);
 	filterFreqSlider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
-	filterFreqSlider.setPopupDisplayEnabled(true, this);
+	//filterFreqSlider.setPopupDisplayEnabled(true, this);
 	filterFreqSlider.setTextValueSuffix(" Cutoff");
 	filterFreqSlider.setValue(processor.filterFreqVal);
 
 	filterQSlider.setSliderStyle(Slider::LinearBarVertical);
 	filterQSlider.setRange(0.0, 1.0, 0.01);
 	filterQSlider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
-	filterQSlider.setPopupDisplayEnabled(true, this);
+	//filterQSlider.setPopupDisplayEnabled(true, this);
 	filterQSlider.setTextValueSuffix(" Cutoff");
 	filterQSlider.setValue(processor.filterQVal);
 
@@ -42,14 +42,14 @@ Juce_vst2AudioProcessorEditor::Juce_vst2AudioProcessorEditor (Juce_vst2AudioProc
 	filter2FreqSlider.setSliderStyle(Slider::LinearBarVertical);
 	filter2FreqSlider.setRange(0.0, 1.0, 0.001);
 	filter2FreqSlider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
-	filter2FreqSlider.setPopupDisplayEnabled(true, this);
+	//filter2FreqSlider.setPopupDisplayEnabled(true, this);
 	filter2FreqSlider.setTextValueSuffix(" Cutoff");
 	filter2FreqSlider.setValue(processor.filter2FreqVal);
 
 	filter2QSlider.setSliderStyle(Slider::LinearBarVertical);
 	filter2QSlider.setRange(0.0, 1.0, 0.01);
 	filter2QSlider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
-	filter2QSlider.setPopupDisplayEnabled(true, this);
+	//filter2QSlider.setPopupDisplayEnabled(true, this);
 	filter2QSlider.setTextValueSuffix(" Cutoff");
 	filter2QSlider.setValue(processor.filter2QVal);
 
