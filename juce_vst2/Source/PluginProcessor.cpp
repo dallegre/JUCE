@@ -233,8 +233,8 @@ void Juce_vst2AudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffe
 		filterFreqScaled = 10000.0f *  pow(freq1P->get(), 3.0);
 		filter2FreqScaled = 20000.0f *  pow(freq2P->get(), 3.0);
 
-		oscAmtValScaled = 50.0f * mamtP->get();
-		oscFreqValScaled = 2.0f * mfreqP->get();
+		oscAmtValScaled = 100.0f * mamtP->get();
+		oscFreqValScaled = 4.0f * mfreqP->get();
 
 		svfilter[channel].setFc(filterFreqScaled, UPSAMPLING);
 		svfilter[channel].setQ(q1P->get());
@@ -325,7 +325,6 @@ void Juce_vst2AudioProcessor::setStateInformation (const void* data, int sizeInB
 	*fbP =    iStream.readFloat();
 	*mamtP =  iStream.readFloat();
 	*mfreqP = iStream.readFloat();
-
 }
 
 //==============================================================================

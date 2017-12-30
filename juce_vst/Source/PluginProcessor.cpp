@@ -25,6 +25,29 @@ Juce_vstAudioProcessor::Juce_vstAudioProcessor()
                        )
 #endif
 {
+	donePrepareToPlay = 0;
+
+	addParameter(dryP = new AudioParameterFloat("dryP", // parameter ID
+		"Dry", // parameter name
+		0.0f,   // mininum value
+		1.0f,   // maximum value
+		1.0f)); // default value
+	addParameter(wetP = new AudioParameterFloat("wetP", // parameter ID
+		"Wet", // parameter name
+		0.0f,   // mininum value
+		1.0f,   // maximum value
+		0.0f)); // default value
+	addParameter(timeP = new AudioParameterFloat("timeP", // parameter ID
+		"Time", // parameter name
+		0.0f,   // mininum value
+		1.0f,   // maximum value
+		0.5f)); // default value
+	addParameter(dampP = new AudioParameterFloat("dampP", // parameter ID
+		"Damping", // parameter name
+		0.0f,   // mininum value
+		1.0f,   // maximum value
+		0.5f)); // default value
+
 }
 
 Juce_vstAudioProcessor::~Juce_vstAudioProcessor()
@@ -90,11 +113,6 @@ void Juce_vstAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
 	if (!donePrepareToPlay) {
-		
-		dryVal = 1.0f;
-		wetVal = 0.5f;
-		timeVal = 0.9f;
-		dampVal = 0.5f;
 
 		feedbackVal = 0.5f;
 		delayVal = 0.6f;
@@ -110,8 +128,8 @@ void Juce_vstAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
 		oscFreqValScaled = 5.0f  * oscFreqVal;				//frequency (roughly) of modulation
 		oscAmtVal2Scaled = 50.0f * oscAmt2Val;				//amount in samples of modulation
 		oscFreqVal2Scaled = 5.0f * oscFreq2Val;				//frequency (roughly) of modulation
-		timeValScaled = 1.0f     * pow(timeVal, 0.5f);
-		dampValScaled = 16000.0f * pow(dampVal, 2.0f);
+		timeValScaled = 1.0f     * pow(timeP->get(), 0.5f);
+		dampValScaled = 16000.0f * pow(dampP->get(), 2.0f);
 
 		feedback[0] = 0.0f;
 		feedback[1] = 0.0f;
@@ -182,6 +200,7 @@ void Juce_vstAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuffer&
 	// audio processing...
 	for (int channel = 0; channel < totalNumInputChannels; ++channel)
 	{
+
 		// ..do something to the data...
 		for (int sample = 0; sample < buffer.getNumSamples(); ++sample) {
 
@@ -196,7 +215,7 @@ void Juce_vstAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuffer&
 
 			//scale the input a bit so you don't saturate as you go through the algorithm
 			data *= 0.25;
-			scaledIn = data * wetVal;
+			scaledIn = data * wetP->get();
 
 			//first two allpass filters are controlled by the user
 			apout1 = allpass[channel].process((scaledIn - feedback[channel] * timeValScaled),
@@ -229,7 +248,7 @@ void Juce_vstAudioProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuffer&
 			}
 			*/
 
-			data = (dryVal * data * 4.0f) - (apout3 * 4.0f);
+			data = (dryP->get() * data * 4.0f) - (apout3 * 4.0f);
 
 			//this is how you can send data to outputs
 			buffer.setSample(channel, sample, data);
@@ -255,12 +274,22 @@ void Juce_vstAudioProcessor::getStateInformation (MemoryBlock& destData)
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
+	MemoryOutputStream oStream(destData, true);
+	oStream.writeFloat(*wetP);
+	oStream.writeFloat(*dryP);
+	oStream.writeFloat(*timeP);
+	oStream.writeFloat(*dampP);
 }
 
 void Juce_vstAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+	MemoryInputStream iStream(data, static_cast<size_t> (sizeInBytes), false);
+	*dryP = iStream.readFloat();
+	*wetP = iStream.readFloat();
+	*timeP = iStream.readFloat();
+	*dampP = iStream.readFloat();
 }
 
 //==============================================================================

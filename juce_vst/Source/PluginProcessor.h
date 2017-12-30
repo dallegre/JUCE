@@ -58,10 +58,10 @@ public:
 
 	float feedback[2];
 
-	float dryVal;
-	float wetVal;
-	float timeVal;
-	float dampVal;
+	AudioParameterFloat* dryP;
+	AudioParameterFloat* wetP;
+	AudioParameterFloat* timeP;
+	AudioParameterFloat* dampP;
 
 	float feedbackVal;
 	float delayVal;
@@ -80,7 +80,7 @@ public:
 	float timeValScaled;
 	float dampValScaled;
 
-	int donePrepareToPlay = 0;
+	int donePrepareToPlay;
 
 	Random random;
 	//just for fun

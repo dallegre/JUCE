@@ -21,6 +21,9 @@ Juce_vstAudioProcessorEditor::Juce_vstAudioProcessorEditor (Juce_vstAudioProcess
 	setSize(460, 300);
 	setResizable(false, true);
 
+	//wait for prepare to play to be done.
+	//while (processor.donePrepareToPlay != 1);
+
 	//the constructor gets called every time you click on the plugin so initialize everything at prepare to play
 	//set up parameters for the slider
 	drySlider.setSliderStyle(Slider::LinearBarVertical);
@@ -28,84 +31,72 @@ Juce_vstAudioProcessorEditor::Juce_vstAudioProcessorEditor (Juce_vstAudioProcess
 	drySlider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
 	drySlider.setPopupDisplayEnabled(true, this);
 	drySlider.setTextValueSuffix(" Dry");
-	drySlider.setValue(processor.dryVal);
 
 	wetSlider.setSliderStyle(Slider::LinearBarVertical);
 	wetSlider.setRange(0.0, 1.0, 0.01);
 	wetSlider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
 	wetSlider.setPopupDisplayEnabled(true, this);
 	wetSlider.setTextValueSuffix(" Wet");
-	wetSlider.setValue(processor.wetVal);
 
 	timeSlider.setSliderStyle(Slider::LinearBarVertical);
 	timeSlider.setRange(0.0, 1.0, 0.01);
 	timeSlider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
 	timeSlider.setPopupDisplayEnabled(true, this);
 	timeSlider.setTextValueSuffix(" Dec");
-	timeSlider.setValue(processor.timeVal);
 
 	dampSlider.setSliderStyle(Slider::LinearBarVertical);
 	dampSlider.setRange(0.0, 1.0, 0.01);
 	dampSlider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
 	dampSlider.setPopupDisplayEnabled(true, this);
 	dampSlider.setTextValueSuffix(" Damp");
-	dampSlider.setValue(processor.dampVal);
 
 	feedbackSlider.setSliderStyle(Slider::LinearBarVertical);
 	feedbackSlider.setRange(0.0, 1.0, 0.01);
 	feedbackSlider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
 	feedbackSlider.setPopupDisplayEnabled(true, this);
 	feedbackSlider.setTextValueSuffix(" Feedback");
-	feedbackSlider.setValue(processor.feedbackVal);
 
 	delaySlider.setSliderStyle(Slider::LinearBarVertical);
 	delaySlider.setRange(0.0, 1.0, 0.01);
 	delaySlider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
 	delaySlider.setPopupDisplayEnabled(true, this);
 	delaySlider.setTextValueSuffix(" Delay");
-	delaySlider.setValue(processor.delayVal);
 
 	oscAmtSlider.setSliderStyle(Slider::LinearBarVertical);
 	oscAmtSlider.setRange(0.0, 1.0, 0.01);
 	oscAmtSlider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
 	oscAmtSlider.setPopupDisplayEnabled(true, this);
 	oscAmtSlider.setTextValueSuffix(" Modulation");
-	oscAmtSlider.setValue(processor.oscAmtVal);
 
 	oscFreqSlider.setSliderStyle(Slider::LinearBarVertical);
 	oscFreqSlider.setRange(0.0, 1.0, 0.01);
 	oscFreqSlider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
 	oscFreqSlider.setPopupDisplayEnabled(true, this);
 	oscFreqSlider.setTextValueSuffix(" Frequency");
-	oscFreqSlider.setValue(processor.oscFreqVal);
 
 	feedback2Slider.setSliderStyle(Slider::LinearBarVertical);
 	feedback2Slider.setRange(0.0, 1.0, 0.01);
 	feedback2Slider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
 	feedback2Slider.setPopupDisplayEnabled(true, this);
 	feedback2Slider.setTextValueSuffix(" Feedback");
-	feedback2Slider.setValue(processor.feedback2Val);
 
 	delay2Slider.setSliderStyle(Slider::LinearBarVertical);
 	delay2Slider.setRange(0.0, 1.0, 0.01);
 	delay2Slider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
 	delay2Slider.setPopupDisplayEnabled(true, this);
 	delay2Slider.setTextValueSuffix(" Delay");
-	delay2Slider.setValue(processor.delay2Val);
 
 	oscAmt2Slider.setSliderStyle(Slider::LinearBarVertical);
 	oscAmt2Slider.setRange(0.0, 1.0, 0.01);
 	oscAmt2Slider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
 	oscAmt2Slider.setPopupDisplayEnabled(true, this);
 	oscAmt2Slider.setTextValueSuffix(" Modulation");
-	oscAmt2Slider.setValue(processor.oscAmt2Val);
 
 	oscFreq2Slider.setSliderStyle(Slider::LinearBarVertical);
 	oscFreq2Slider.setRange(0.0, 1.0, 0.01);
 	oscFreq2Slider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
 	oscFreq2Slider.setPopupDisplayEnabled(true, this);
 	oscFreq2Slider.setTextValueSuffix(" Frequency");
-	oscFreq2Slider.setValue(processor.oscFreq2Val);
 
 	//add the slider to the editor
 	addAndMakeVisible(&drySlider);
@@ -138,14 +129,35 @@ Juce_vstAudioProcessorEditor::Juce_vstAudioProcessorEditor (Juce_vstAudioProcess
 	delay2Slider.addListener(this);
 	oscAmt2Slider.addListener(this);
 	oscFreq2Slider.addListener(this);
+
+/*
+#ifdef GPP
+	sleep(1000);
+#else
+	_sleep(1000);
+#endif
+*/
+
+	//timer for reading parameters and updating the sliders.  Initialize them there as well.
+	startTimer(100);
 }
 
 //add listener function for volume slider
 void Juce_vstAudioProcessorEditor::sliderValueChanged(Slider* slider) {
-	processor.dryVal =       drySlider.getValue();
-	processor.wetVal =       wetSlider.getValue();
-	processor.timeVal =      timeSlider.getValue();
-	processor.dampVal =      dampSlider.getValue();
+
+	//update both the slider and the parameter with these float values
+	drySliderVal =  drySlider.getValue();
+	wetSliderVal =  wetSlider.getValue();
+	timeSliderVal = timeSlider.getValue();
+	dampSliderVal = dampSlider.getValue();
+	AudioProcessorParameter* dryPp = processor.dryP;		//the setVale method is "unavailable from the AudioParameterFloat class..
+	dryPp->setValue(drySliderVal);
+	AudioProcessorParameter* wetPp = processor.wetP;
+	wetPp->setValue(wetSliderVal);
+	AudioProcessorParameter* timePp = processor.timeP;
+	timePp->setValue(timeSliderVal);
+	AudioProcessorParameter* dampPp = processor.dampP;
+	dampPp->setValue(dampSliderVal);
 
 	processor.feedbackVal =  feedbackSlider.getValue();
 	processor.delayVal =     delaySlider.getValue();
@@ -161,8 +173,8 @@ void Juce_vstAudioProcessorEditor::sliderValueChanged(Slider* slider) {
 	processor.oscFreqValScaled =  5.0f  * processor.oscFreqVal;				//frequency (roughly) of modulation
 	processor.oscAmtVal2Scaled =  50.0f * processor.oscAmt2Val;				//amount in samples of modulation
 	processor.oscFreqVal2Scaled = 5.0f  * processor.oscFreq2Val;			//frequency (roughly) of modulation
-	processor.timeValScaled =     1.0f  * pow(processor.timeVal, 0.5f);
-	processor.dampValScaled =     16000.0f  * pow(processor.dampVal, 2.0f);
+	processor.timeValScaled =     1.0f  * pow(processor.timeP->get(), 0.5f);
+	processor.dampValScaled =     16000.0f  * pow(processor.dampP->get(), 2.0f);
 
 	processor.damping[0].setFc(processor.dampValScaled);
 	processor.damping[1].setFc(processor.dampValScaled);
@@ -222,4 +234,43 @@ void Juce_vstAudioProcessorEditor::resized()
 	delay2Slider.setBounds   (360,  60, 20, getHeight() - 90);
 	oscAmt2Slider.setBounds  (390,  60, 20, getHeight() - 90);
 	oscFreq2Slider.setBounds (420,  60, 20, getHeight() - 90);
+}
+
+
+
+
+//add timerCallback so that when parameters are updated, the sliders get updated too..
+void Juce_vstAudioProcessorEditor::timerCallback()
+{
+
+	//update both the parameter and the slider with these float values
+	drySliderVal =  processor.dryP->get();
+	wetSliderVal =  processor.wetP->get();
+	timeSliderVal = processor.timeP->get();
+	dampSliderVal = processor.dampP->get();
+	drySlider.setValue(drySliderVal);
+	wetSlider.setValue(wetSliderVal);
+	timeSlider.setValue(timeSliderVal);
+	dampSlider.setValue(dampSliderVal);
+
+	feedbackSlider.setValue(processor.feedbackVal);
+	delaySlider.setValue(processor.delayVal);
+	oscAmtSlider.setValue(processor.oscAmtVal);
+	oscFreqSlider.setValue(processor.oscFreqVal);
+
+	feedback2Slider.setValue(processor.feedback2Val);
+	delay2Slider.setValue(processor.delay2Val);
+	oscAmt2Slider.setValue(processor.oscAmt2Val);
+	oscFreq2Slider.setValue(processor.oscFreq2Val);
+
+	processor.oscAmtValScaled = 50.0f * processor.oscAmtVal;				//amount in samples of modulation
+	processor.oscFreqValScaled = 5.0f  * processor.oscFreqVal;				//frequency (roughly) of modulation
+	processor.oscAmtVal2Scaled = 50.0f * processor.oscAmt2Val;				//amount in samples of modulation
+	processor.oscFreqVal2Scaled = 5.0f  * processor.oscFreq2Val;			//frequency (roughly) of modulation
+	processor.timeValScaled = 1.0f  * pow(processor.timeP->get(), 0.5f);
+	processor.dampValScaled = 16000.0f  * pow(processor.dampP->get(), 2.0f);
+
+	processor.damping[0].setFc(processor.dampValScaled);
+	processor.damping[1].setFc(processor.dampValScaled);
+
 }
