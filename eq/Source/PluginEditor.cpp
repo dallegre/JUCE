@@ -18,77 +18,78 @@ EqAudioProcessorEditor::EqAudioProcessorEditor (EqAudioProcessor& p)
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
+    /*
     setSize (430, 300);
     
     amp1Slider.setSliderStyle(Slider::LinearBarVertical);
     amp1Slider.setRange(0.0, 1.0, 0.001);
     amp1Slider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
-    amp1Slider.setPopupDisplayEnabled(true, this);
+    //amp1Slider.setPopupDisplayEnabled(true, this);
     amp1Slider.setTextValueSuffix(" amp1");
-    amp1Slider.setValue(processor.amp1Val);
+    //amp1Slider.setValue(processor.amp1Val);
     
     freq1Slider.setSliderStyle(Slider::LinearBarVertical);
     freq1Slider.setRange(0.0, 1.0, 0.001);
     freq1Slider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
-    freq1Slider.setPopupDisplayEnabled(true, this);
+    //freq1Slider.setPopupDisplayEnabled(true, this);
     freq1Slider.setTextValueSuffix(" freq1");
-    freq1Slider.setValue(processor.freq1Val);
+    //freq1Slider.setValue(processor.freq1Val);
 
 	q1Slider.setSliderStyle(Slider::LinearBarVertical);
 	q1Slider.setRange(0.0, 1.0, 0.001);
 	q1Slider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
-	q1Slider.setPopupDisplayEnabled(true, this);
+	//q1Slider.setPopupDisplayEnabled(true, this);
 	q1Slider.setTextValueSuffix(" q1");
-	q1Slider.setValue(processor.q1Val);
+	//q1Slider.setValue(processor.q1Val);
     
     amp2Slider.setSliderStyle(Slider::LinearBarVertical);
     amp2Slider.setRange(0.0, 1.0, 0.001);
     amp2Slider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
-    amp2Slider.setPopupDisplayEnabled(true, this);
+    //amp2Slider.setPopupDisplayEnabled(true, this);
     amp2Slider.setTextValueSuffix(" amp2");
-    amp2Slider.setValue(processor.amp2Val);
+    //amp2Slider.setValue(processor.amp2Val);
     
     freq2Slider.setSliderStyle(Slider::LinearBarVertical);
     freq2Slider.setRange(0.0, 1.0, 0.001);
     freq2Slider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
-    freq2Slider.setPopupDisplayEnabled(true, this);
+    //freq2Slider.setPopupDisplayEnabled(true, this);
     freq2Slider.setTextValueSuffix(" freq2");
-    freq2Slider.setValue(processor.freq2Val);
+    //freq2Slider.setValue(processor.freq2Val);
 
 	q2Slider.setSliderStyle(Slider::LinearBarVertical);
 	q2Slider.setRange(0.0, 1.0, 0.001);
 	q2Slider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
-	q2Slider.setPopupDisplayEnabled(true, this);
+	//q2Slider.setPopupDisplayEnabled(true, this);
 	q2Slider.setTextValueSuffix(" q2");
-	q2Slider.setValue(processor.q2Val);
+	//q2Slider.setValue(processor.q2Val);
 
 	amp3Slider.setSliderStyle(Slider::LinearBarVertical);
 	amp3Slider.setRange(0.0, 1.0, 0.001);
 	amp3Slider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
-	amp3Slider.setPopupDisplayEnabled(true, this);
+	//amp3Slider.setPopupDisplayEnabled(true, this);
 	amp3Slider.setTextValueSuffix(" amp3");
-	amp3Slider.setValue(processor.amp3Val);
+	//amp3Slider.setValue(processor.amp3Val);
 
 	freq3Slider.setSliderStyle(Slider::LinearBarVertical);
 	freq3Slider.setRange(0.0, 1.0, 0.001);
 	freq3Slider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
-	freq3Slider.setPopupDisplayEnabled(true, this);
+	//freq3Slider.setPopupDisplayEnabled(true, this);
 	freq3Slider.setTextValueSuffix(" freq3");
-	freq3Slider.setValue(processor.freq3Val);
+	//freq3Slider.setValue(processor.freq3Val);
 
 	q3Slider.setSliderStyle(Slider::LinearBarVertical);
 	q3Slider.setRange(0.0, 1.0, 0.001);
 	q3Slider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
-	q3Slider.setPopupDisplayEnabled(true, this);
+	//q3Slider.setPopupDisplayEnabled(true, this);
 	q3Slider.setTextValueSuffix(" q3");
-	q3Slider.setValue(processor.q3Val);
+	//q3Slider.setValue(processor.q3Val);
 
 	gainSlider.setSliderStyle(Slider::LinearBarVertical);
 	gainSlider.setRange(0.0, 1.0, 0.001);
 	gainSlider.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
-	gainSlider.setPopupDisplayEnabled(true, this);
+	//gainSlider.setPopupDisplayEnabled(true, this);
 	gainSlider.setTextValueSuffix(" gain");
-	gainSlider.setValue(processor.gainVal);
+	//gainSlider.setValue(processor.gainVal);
     
 	addAndMakeVisible(&amp1Slider);
 	addAndMakeVisible(&freq1Slider);
@@ -111,10 +112,11 @@ EqAudioProcessorEditor::EqAudioProcessorEditor (EqAudioProcessor& p)
 	freq3Slider.addListener(this);
 	q3Slider.addListener(this);
 	gainSlider.addListener(this);
-
+*/
 }
 
 void EqAudioProcessorEditor::sliderValueChanged(Slider* slider){
+    /*
     processor.amp1Val =  amp1Slider.getValue();
     processor.freq1Val = freq1Slider.getValue();
 	processor.q1Val =    q1Slider.getValue();
@@ -138,6 +140,7 @@ void EqAudioProcessorEditor::sliderValueChanged(Slider* slider){
         processor.filter2[i].setFc(processor.freq2ValScaled, processor.amp2ValScaled, processor.q2Val);
 		processor.filter3[i].setFc(processor.freq3ValScaled, processor.amp3ValScaled, processor.q3Val);
     }
+     */
 }
 
 EqAudioProcessorEditor::~EqAudioProcessorEditor()
@@ -148,6 +151,7 @@ EqAudioProcessorEditor::~EqAudioProcessorEditor()
 void EqAudioProcessorEditor::paint (Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
+  /*
     g.fillAll(Colours::white);
     
     g.setColour(Colours::black);
@@ -170,13 +174,14 @@ void EqAudioProcessorEditor::paint (Graphics& g)
 	g.drawFittedText("q",     330, 30, getWidth(), 30, Justification::bottom, 1);
 
 	g.drawFittedText("amp",   390, 30, getWidth(), 30, Justification::bottom, 1);
+   */
 }
 
 void EqAudioProcessorEditor::resized()
 {
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
-    
+    /*
     amp1Slider.setBounds    (30, 60, 20, getHeight() - 90);
     freq1Slider.setBounds   (60, 60, 20, getHeight() - 90);
 	q1Slider.setBounds      (90, 60, 20,  getHeight() - 90);
@@ -190,5 +195,5 @@ void EqAudioProcessorEditor::resized()
 	q3Slider.setBounds      (330, 60, 20, getHeight() - 90);
 
 	gainSlider.setBounds    (390, 60, 20, getHeight() - 90);
-    
+    */
 }
