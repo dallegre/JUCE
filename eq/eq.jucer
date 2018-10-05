@@ -9,8 +9,13 @@
               pluginChannelConfigs="" pluginIsSynth="0" pluginWantsMidiIn="0"
               pluginProducesMidiOut="0" pluginIsMidiEffectPlugin="0" pluginEditorRequiresKeys="0"
               pluginAUExportPrefix="eqAU" pluginRTASCategory="" aaxIdentifier="com.dan.eq"
+<<<<<<< HEAD
+              pluginAAXCategory="2" jucerVersion="5.3.2" cppLanguageStandard="11"
+              companyCopyright="" pluginFormats="buildVST,buildAU">
+=======
               pluginAAXCategory="AAX_ePlugInCategory_Dynamics" jucerVersion="5.2.0"
               cppLanguageStandard="11" companyCopyright="dan" companyName="dan">
+>>>>>>> 0f0dd64d30e09ee0b62f50efd939db6e97d02703
   <MAINGROUP id="F8z6Kz" name="eq">
     <GROUP id="{1738C606-4115-6551-4DEE-06A4CF1DADA1}" name="Source">
       <FILE id="pQbha0" name="PluginProcessor.cpp" compile="1" resource="0"
@@ -55,20 +60,20 @@
                        enablePluginBinaryCopyStep="0" linkTimeOptimisation="1"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
-        <MODULEPATH id="juce_video" path="../../JUCE2/JUCE/modules"/>
-        <MODULEPATH id="juce_opengl" path="../../JUCE2/JUCE/modules"/>
-        <MODULEPATH id="juce_gui_extra" path="../../JUCE2/JUCE/modules"/>
-        <MODULEPATH id="juce_gui_basics" path="../../JUCE2/JUCE/modules"/>
-        <MODULEPATH id="juce_graphics" path="../../JUCE2/JUCE/modules"/>
-        <MODULEPATH id="juce_events" path="../../JUCE2/JUCE/modules"/>
-        <MODULEPATH id="juce_data_structures" path="../../JUCE2/JUCE/modules"/>
-        <MODULEPATH id="juce_cryptography" path="../../JUCE2/JUCE/modules"/>
-        <MODULEPATH id="juce_core" path="../../JUCE2/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_processors" path="../../JUCE2/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_plugin_client" path="../../JUCE2/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_formats" path="../../JUCE2/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_devices" path="../../JUCE2/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_basics" path="../../JUCE2/JUCE/modules"/>
+        <MODULEPATH id="juce_video" path="..\..\..\Downloads\juce-5.3.2-windows\JUCE\modules"/>
+        <MODULEPATH id="juce_opengl" path="..\..\..\Downloads\juce-5.3.2-windows\JUCE\modules"/>
+        <MODULEPATH id="juce_gui_extra" path="..\..\..\Downloads\juce-5.3.2-windows\JUCE\modules"/>
+        <MODULEPATH id="juce_gui_basics" path="..\..\..\Downloads\juce-5.3.2-windows\JUCE\modules"/>
+        <MODULEPATH id="juce_graphics" path="..\..\..\Downloads\juce-5.3.2-windows\JUCE\modules"/>
+        <MODULEPATH id="juce_events" path="..\..\..\Downloads\juce-5.3.2-windows\JUCE\modules"/>
+        <MODULEPATH id="juce_data_structures" path="..\..\..\Downloads\juce-5.3.2-windows\JUCE\modules"/>
+        <MODULEPATH id="juce_cryptography" path="..\..\..\Downloads\juce-5.3.2-windows\JUCE\modules"/>
+        <MODULEPATH id="juce_core" path="..\..\..\Downloads\juce-5.3.2-windows\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_processors" path="..\..\..\Downloads\juce-5.3.2-windows\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="..\..\..\Downloads\juce-5.3.2-windows\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_formats" path="..\..\..\Downloads\juce-5.3.2-windows\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_devices" path="..\..\..\Downloads\juce-5.3.2-windows\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_basics" path="..\..\..\Downloads\juce-5.3.2-windows\JUCE\modules"/>
       </MODULEPATHS>
     </VS2015>
   </EXPORTFORMATS>
@@ -89,5 +94,8 @@
     <MODULE id="juce_opengl" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_video" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
   </MODULES>
-  <JUCEOPTIONS JUCE_QUICKTIME="disabled"/>
+  <JUCEOPTIONS JUCE_QUICKTIME="0"/>
+  <LIVE_SETTINGS>
+    <WINDOWS/>
+  </LIVE_SETTINGS>
 </JUCERPROJECT>
