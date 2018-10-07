@@ -10,7 +10,7 @@
               pluginProducesMidiOut="0" pluginIsMidiEffectPlugin="0" pluginEditorRequiresKeys="0"
               pluginAUExportPrefix="filterdelayAU" pluginRTASCategory="" aaxIdentifier="com.dan.filterdelay"
               pluginAAXCategory="2" jucerVersion="5.3.2" companyName="dan"
-              cppLanguageStandard="11" companyCopyright="dan" pluginFormats="buildAU,buildVST">
+              cppLanguageStandard="11" companyCopyright="dan" pluginFormats="buildVST,buildAU">
   <MAINGROUP id="KqXb3H" name="filterdelay">
     <GROUP id="{FD6C660B-3679-5B28-85DF-FDB42DDAC18C}" name="Source">
       <FILE id="I3zxkm" name="GenericEditor.h" compile="0" resource="0" file="Source/GenericEditor.h"/>
@@ -111,5 +111,6 @@
   <JUCEOPTIONS JUCE_QUICKTIME="disabled"/>
   <LIVE_SETTINGS>
     <WINDOWS/>
+    <OSX/>
   </LIVE_SETTINGS>
 </JUCERPROJECT>
