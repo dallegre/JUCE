@@ -43,7 +43,7 @@ public:
         : AudioProcessorEditor (parent),
           noParameterLabel ("noparam", "No parameters available")
     {
-        const OwnedArray<AudioProcessorParameter>& params = parent.getParameters();
+        const juce::Array<AudioProcessorParameter*>& params = parent.getParameters();
         for (int i = 0; i < params.size(); ++i)
         {
             if (const AudioParameterFloat* param = dynamic_cast<AudioParameterFloat*>(params[i]))
@@ -132,7 +132,7 @@ public:
 private:
     void timerCallback() override
     {
-        const OwnedArray<AudioProcessorParameter>& params = getAudioProcessor()->getParameters();
+        const juce::Array<AudioProcessorParameter*>& params = getAudioProcessor()->getParameters();
         for (int i = 0; i < params.size(); ++i)
         {
             if (const AudioProcessorParameter* param = params[i])
@@ -145,7 +145,7 @@ private:
 
     AudioProcessorParameter* getParameterForSlider (Slider* slider)
     {
-        const OwnedArray<AudioProcessorParameter>& params = getAudioProcessor()->getParameters();
+        const juce::Array<AudioProcessorParameter*>& params = getAudioProcessor()->getParameters();
         return params[paramSliders.indexOf (slider)];
     }
 

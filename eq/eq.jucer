@@ -2,15 +2,15 @@
 
 <JUCERPROJECT id="tz9BNl" name="eq" displaySplashScreen="1" reportAppUsage="1"
               splashScreenColour="Dark" projectType="audioplug" version="1.0.0"
-              bundleIdentifier="com.dan.eq" includeBinaryInAppConfig="1" buildVST="1"
-              buildVST3="0" buildAU="1" buildAUv3="0" buildRTAS="0" buildAAX="0"
-              buildStandalone="1" enableIAA="0" pluginName="eq" pluginDesc="eq"
+              bundleIdentifier="com.dan.eq" includeBinaryInAppConfig="1" buildVST="0"
+              buildVST3="1" buildAU="1" buildAUv3="0" buildRTAS="0" buildAAX="0"
+              buildStandalone="0" enableIAA="0" pluginName="eq" pluginDesc="eq"
               pluginManufacturer="dan" pluginManufacturerCode="Manu" pluginCode="Tz9b"
               pluginChannelConfigs="" pluginIsSynth="0" pluginWantsMidiIn="0"
               pluginProducesMidiOut="0" pluginIsMidiEffectPlugin="0" pluginEditorRequiresKeys="0"
               pluginAUExportPrefix="eqAU" pluginRTASCategory="" aaxIdentifier="com.dan.eq"
-              pluginAAXCategory="2" jucerVersion="5.3.2" cppLanguageStandard="11"
-              companyCopyright="dan" companyName="dan" pluginFormats="buildVST,buildAU,buildStandalone">
+              pluginAAXCategory="2" cppLanguageStandard="11" companyCopyright="dan"
+              companyName="dan" pluginFormats="buildAU,buildVST3" jucerFormatVersion="1">
   <MAINGROUP id="F8z6Kz" name="eq">
     <GROUP id="{1738C606-4115-6551-4DEE-06A4CF1DADA1}" name="Source">
       <FILE id="Ktuf6U" name="DSP.h" compile="0" resource="0" file="Source/DSP.h"/>
@@ -72,6 +72,29 @@
         <MODULEPATH id="juce_audio_utils" path="../../../Downloads/JUCE-2/modules"/>
       </MODULEPATHS>
     </VS2015>
+    <VS2019 targetFolder="Builds/VisualStudio2019">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug"/>
+        <CONFIGURATION isDebug="0" name="Release"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_video"/>
+        <MODULEPATH id="juce_opengl"/>
+        <MODULEPATH id="juce_gui_extra"/>
+        <MODULEPATH id="juce_gui_basics"/>
+        <MODULEPATH id="juce_graphics"/>
+        <MODULEPATH id="juce_events"/>
+        <MODULEPATH id="juce_data_structures"/>
+        <MODULEPATH id="juce_cryptography"/>
+        <MODULEPATH id="juce_core"/>
+        <MODULEPATH id="juce_audio_utils"/>
+        <MODULEPATH id="juce_audio_processors"/>
+        <MODULEPATH id="juce_audio_plugin_client"/>
+        <MODULEPATH id="juce_audio_formats"/>
+        <MODULEPATH id="juce_audio_devices"/>
+        <MODULEPATH id="juce_audio_basics"/>
+      </MODULEPATHS>
+    </VS2019>
   </EXPORTFORMATS>
   <MODULES>
     <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
@@ -94,5 +117,6 @@
   <JUCEOPTIONS JUCE_QUICKTIME="disabled"/>
   <LIVE_SETTINGS>
     <OSX/>
+    <WINDOWS/>
   </LIVE_SETTINGS>
 </JUCERPROJECT>
